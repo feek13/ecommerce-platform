@@ -284,8 +284,8 @@ export default function SellerProductsPage() {
             ))}
           </div>
 
-          {/* Desktop Table Layout */}
-          <div className="hidden md:block bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Desktop Table Layout - Only on large screens */}
+          <div className="hidden lg:block bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -390,6 +390,93 @@ export default function SellerProductsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Tablet Card Layout - md to lg screens */}
+          <div className="hidden md:block lg:hidden space-y-4">
+            {filteredProducts.map((product) => (
+              <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-4 flex gap-4">
+                  {/* Product Image and Info */}
+                  <div className="h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src={product.images?.[0] || 'https://via.placeholder.com/100'}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-medium text-gray-900 line-clamp-1 mb-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-500 line-clamp-2 mb-2">
+                          {product.description}
+                        </p>
+                      </div>
+                      <span
+                        className={`flex-shrink-0 inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
+                          product.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {product.status === 'active' ? '在售' : '已下架'}
+                      </span>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-3 gap-3 mb-3">
+                      <div>
+                        <div className="text-xs text-gray-500 mb-0.5">价格</div>
+                        <div className="text-sm font-semibold text-gray-900">¥{product.price.toFixed(2)}</div>
+                        {product.original_price && product.original_price > product.price && (
+                          <div className="text-xs text-gray-400 line-through">¥{product.original_price.toFixed(2)}</div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500 mb-0.5">库存</div>
+                        <div className={`text-sm font-medium ${
+                          product.stock === 0 ? 'text-red-600' :
+                          product.stock < 10 ? 'text-orange-600' :
+                          'text-gray-900'
+                        }`}>
+                          {product.stock} 件
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500 mb-0.5">销量</div>
+                        <div className="text-sm font-medium text-gray-900">{product.sales_count || 0}</div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/seller/products/${product.id}/edit`}
+                        className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition text-center"
+                      >
+                        编辑
+                      </Link>
+                      <button
+                        onClick={() => handleToggleStatus(product.id, product.status)}
+                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
+                      >
+                        {product.status === 'active' ? '下架' : '上架'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}

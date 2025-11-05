@@ -35,3 +35,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation
+*.docx
+*.doc
+*.pdf
+screenshots/
+temp_pet_doc/
