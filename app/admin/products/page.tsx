@@ -42,6 +42,7 @@ export default function AdminProductsPage() {
     message: string
     onConfirm: () => void
     type?: 'danger' | 'warning' | 'info'
+    confirmText?: string
   }>({
     isOpen: false,
     title: '',
@@ -180,7 +181,7 @@ export default function AdminProductsPage() {
         title={confirmDialog.title}
         message={confirmDialog.message}
         type={confirmDialog.type}
-        confirmText={(confirmDialog as any).confirmText}
+        confirmText={confirmDialog.confirmText}
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
       />
