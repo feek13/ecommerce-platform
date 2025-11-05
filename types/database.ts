@@ -20,7 +20,7 @@ export type MessageType = 'text' | 'image' | 'order_info'
 export interface Profile {
   id: string
   email: string
-  full_name?: string
+  full_name?: string | null
   avatar_url?: string
   phone?: string
   role: UserRole
