@@ -40,10 +40,10 @@ export default function SellerDashboard() {
         .eq('orders.seller_id', user?.id)
 
       const totalOrders = orders?.length || 0
-      const pendingOrders = orders?.filter((o) => o.orders?.status === 'pending' || o.orders?.status === 'processing').length || 0
+      const pendingOrders = orders?.filter((o: any) => o.orders?.status === 'pending' || o.orders?.status === 'processing').length || 0
 
       // Calculate revenue
-      const totalRevenue = orders?.reduce((sum, item) => sum + (item.quantity * item.price), 0) || 0
+      const totalRevenue = orders?.reduce((sum: number, item: any) => sum + (item.quantity * item.price), 0) || 0
 
       setStats({
         totalProducts,
