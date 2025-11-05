@@ -21,6 +21,33 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon',
   },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_CN',
+    url: 'https://ecommerce-platform.vercel.app',
+    title: '智选商城 - 您的在线购物平台',
+    description: '智选商城 - 提供电子产品、服装鞋包、家居生活等多品类商品的在线购物平台。安全可靠，品质保证，让购物更轻松！',
+    siteName: '智选商城',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: '智选商城 - 您的在线购物平台',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '智选商城 - 您的在线购物平台',
+    description: '智选商城 - 提供电子产品、服装鞋包、家居生活等多品类商品的在线购物平台。安全可靠，品质保证，让购物更轻松！',
+    images: ['/opengraph-image'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  metadataBase: new URL('https://ecommerce-platform.vercel.app'),
 }
 
 export default function RootLayout({
