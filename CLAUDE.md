@@ -849,3 +849,113 @@ INSERT INTO categories (name, slug, description, display_order) VALUES
 
 ### 3. Add Test Products
 See `/add-products.sql` for batch product insertion script. Execute in Supabase SQL Editor.
+
+## Next.js 15 Requirements
+
+### Suspense Boundary for useSearchParams
+
+**Critical**: Next.js 15 requires `useSearchParams()` to be wrapped in a Suspense boundary during static generation.
+
+**Pattern**:
+```typescript
+// ❌ WRONG - causes prerender error
+export default function Page() {
+  const searchParams = useSearchParams()
+  // ...
+}
+
+// ✅ CORRECT - wrap in Suspense
+function PageContent() {
+  const searchParams = useSearchParams()
+  // ...
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingUI />}>
+      <PageContent />
+    </Suspense>
+  )
+}
+```
+
+**Error Message**: `useSearchParams() should be wrapped in a suspense boundary`
+
+**Affected Files**: Any page using `useSearchParams`, `usePathname`, or other dynamic hooks.
+
+## Metadata and SEO
+
+### Favicon
+- Location: `app/icon.tsx`
+- Dynamic generation using Next.js `ImageResponse`
+- Shopping cart icon with purple gradient background
+- Automatically served at `/icon`
+
+### Open Graph Images
+- Location: `app/opengraph-image.tsx`
+- Size: 1200x630 (social media standard)
+- Dynamic generation with brand design
+- Used for link previews on Facebook, Twitter, LinkedIn, WeChat
+
+### Metadata Configuration
+Location: `app/layout.tsx`
+
+```typescript
+export const metadata: Metadata = {
+  title: {
+    default: '智选商城 - 您的在线购物平台',
+    template: '%s | 智选商城'
+  },
+  openGraph: {
+    images: ['/opengraph-image'],
+    // ...
+  },
+  twitter: {
+    card: 'summary_large_image',
+    // ...
+  },
+  metadataBase: new URL('https://your-domain.vercel.app')
+}
+```
+
+**Important**: Update `metadataBase` with your actual deployment URL.
+
+## TypeScript Type Patterns
+
+### Product Type with Relations
+```typescript
+// types/database.ts
+export interface Product {
+  id: string
+  seller_id: string
+  category_id?: string
+  // ... other fields
+  seller?: Profile      // Optional joined relation
+  category?: Category   // Optional joined relation
+}
+```
+
+### Profile Type with Nullable Fields
+```typescript
+export interface Profile {
+  full_name?: string | null  // Supports undefined and null
+  // ...
+}
+```
+
+**Why**: TypeScript union types for compatibility with different query patterns and nullable database columns.
+
+### Type Annotations for Complex Queries
+When TypeScript cannot infer types from complex Supabase queries, use explicit annotations:
+
+```typescript
+// Explicit type for nested objects
+const pendingOrders = orders?.filter((o: any) =>
+  o.orders?.status === 'pending'
+).length || 0
+
+// Explicit type for reduce accumulator
+const totalRevenue = orders?.reduce((sum: number, item: any) =>
+  sum + (item.quantity * item.price), 0
+) || 0
+```
