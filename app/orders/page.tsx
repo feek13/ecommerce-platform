@@ -9,6 +9,8 @@ import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import ReviewModal from '@/components/review/ReviewModal'
+import { hasUserReviewedProduct } from '@/lib/supabase-fetch'
 
 type Order = {
   id: number
@@ -49,6 +51,14 @@ export default function OrdersPage() {
     message: '',
     onConfirm: () => {},
   })
+  const [reviewModal, setReviewModal] = useState<{
+    isOpen: boolean
+    orderId: string
+    productId: string
+    productName: string
+    productImage?: string
+  } | null>(null)
+  const [reviewedProducts, setReviewedProducts] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -97,6 +107,36 @@ export default function OrdersPage() {
     }
   }, [filter])
 
+  // Check which products have been reviewed
+  useEffect(() => {
+    async function checkReviews() {
+      if (!user || orders.length === 0) return
+
+      const reviewed = new Set<string>()
+      for (const order of orders) {
+        if (order.status === 'delivered' && order.order_items) {
+          for (const item of order.order_items) {
+            try {
+              const hasReview = await hasUserReviewedProduct(
+                user.id,
+                item.product_id.toString(),
+                order.id.toString()
+              )
+              if (hasReview) {
+                reviewed.add(`${order.id}-${item.product_id}`)
+              }
+            } catch (error) {
+              console.error('Error checking review status:', error)
+            }
+          }
+        }
+      }
+      setReviewedProducts(reviewed)
+    }
+
+    checkReviews()
+  }, [orders, user])
+
   const getStatusText = (status: string) => {
     const statusMap: Record<string, { text: string; color: string }> = {
       pending: { text: '待付款', color: 'text-yellow-600 bg-yellow-50' },
@@ -143,9 +183,41 @@ export default function OrdersPage() {
         )
       case 'delivered':
         return (
-          <button className="px-3 md:px-4 py-2.5 md:py-2.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 active:bg-gray-50 transition text-xs md:text-sm whitespace-nowrap min-h-[44px]">
-            评价
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {order.order_items?.map((item) => {
+              const reviewKey = `${order.id}-${item.product_id}`
+              const hasReviewed = reviewedProducts.has(reviewKey)
+
+              if (hasReviewed) {
+                return (
+                  <div
+                    key={item.id}
+                    className="px-3 md:px-4 py-2.5 text-xs md:text-sm text-gray-500 whitespace-nowrap"
+                  >
+                    ✓ 已评价
+                  </div>
+                )
+              }
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setReviewModal({
+                      isOpen: true,
+                      orderId: order.id.toString(),
+                      productId: item.product_id.toString(),
+                      productName: item.product?.name || '',
+                      productImage: item.product?.images?.[0]
+                    })
+                  }
+                  className="px-3 md:px-4 py-2.5 border border-purple-600 text-purple-600 rounded hover:bg-purple-50 active:bg-purple-50 transition text-xs md:text-sm font-medium whitespace-nowrap min-h-[44px]"
+                >
+                  评价
+                </button>
+              )
+            })}
+          </div>
         )
       default:
         return null
@@ -386,6 +458,22 @@ export default function OrdersPage() {
       </div>
 
       <Footer />
+
+      {/* Review Modal */}
+      {reviewModal && (
+        <ReviewModal
+          isOpen={reviewModal.isOpen}
+          onClose={() => setReviewModal(null)}
+          orderId={reviewModal.orderId}
+          productId={reviewModal.productId}
+          productName={reviewModal.productName}
+          productImage={reviewModal.productImage}
+          onSuccess={() => {
+            setReviewModal(null)
+            fetchOrders() // Refresh to update review status
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { getAllProducts } from '@/lib/supabase-fetch'
+import { getAllProducts, getProductsByCategory } from '@/lib/supabase-fetch'
 import type { Product } from '@/types/database'
 import ProductCard from '@/components/product/ProductCard'
 import Header from '@/components/layout/Header'
@@ -10,6 +11,8 @@ import Footer from '@/components/layout/Footer'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams()
+  const category = searchParams.get('category')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -17,13 +20,20 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts()
-  }, [])
+  }, [category])
 
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      console.log('🔄 Fetching products with direct fetch...')
-      const data = await getAllProducts(20)
+      console.log('🔄 Fetching products...', category ? `category: ${category}` : 'all products')
+
+      let data
+      if (category) {
+        data = await getProductsByCategory(category, 50)
+      } else {
+        data = await getAllProducts(50)
+      }
+
       console.log('✅ Products loaded:', data?.length || 0)
       setProducts(data || [])
     } catch (err: any) {

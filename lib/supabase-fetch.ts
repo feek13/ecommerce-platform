@@ -76,6 +76,21 @@ export async function getAllProducts(limit = 20) {
   )
 }
 
+export async function getProductsByCategory(categorySlug: string, limit = 50) {
+  // First, get the category ID by slug
+  const categories = await supabaseFetch(`categories?slug=eq.${categorySlug}`)
+  if (!categories || categories.length === 0) {
+    return []
+  }
+
+  const categoryId = categories[0].id
+
+  // Then get products by category_id
+  return supabaseFetch(
+    `products?status=eq.active&category_id=eq.${categoryId}&select=*,seller:profiles!products_seller_id_fkey(id,role,full_name),category:categories(id,name,slug)&order=created_at.desc&limit=${limit}`
+  )
+}
+
 export async function getCategories(limit = 8) {
   return supabaseFetch(`categories?order=display_order.asc&limit=${limit}`)
 }
@@ -121,5 +136,88 @@ export async function removeCartItem(itemId: string) {
 export async function clearCartItems(userId: string) {
   return supabaseFetch(`cart_items?user_id=eq.${userId}`, {
     method: 'DELETE'
+  })
+}
+
+// Review operations
+export async function submitReview(review: {
+  product_id: string
+  order_id: string
+  user_id: string
+  rating: number
+  content?: string
+  images: string[]
+}) {
+  return supabaseFetch('reviews', {
+    method: 'POST',
+    body: JSON.stringify(review)
+  })
+}
+
+export async function getProductReviews(productId: string, limit = 20, offset = 0) {
+  return supabaseFetch(
+    `reviews?product_id=eq.${productId}&select=*,user:profiles!reviews_user_id_fkey(id,email,full_name,avatar_url)&order=created_at.desc&limit=${limit}&offset=${offset}`
+  )
+}
+
+export async function getProductReviewStats(productId: string) {
+  return supabaseFetch(
+    `reviews?product_id=eq.${productId}&select=rating`
+  )
+}
+
+export async function getUserReviews(userId: string) {
+  return supabaseFetch(
+    `reviews?user_id=eq.${userId}&select=*,product:products(id,name,images)&order=created_at.desc`
+  )
+}
+
+export async function hasUserReviewedProduct(userId: string, productId: string, orderId: string) {
+  const data = await supabaseFetch(
+    `reviews?user_id=eq.${userId}&product_id=eq.${productId}&order_id=eq.${orderId}&select=id`
+  )
+  return data.length > 0
+}
+
+// Chat functions
+export async function getChatConversations(userId: string) {
+  return supabaseFetch(
+    `conversations?or=(buyer_id.eq.${userId},seller_id.eq.${userId})&select=*,buyer:profiles!conversations_buyer_id_fkey(id,email,full_name,avatar_url),seller:profiles!conversations_seller_id_fkey(id,email,full_name,avatar_url),product:products!conversations_product_id_fkey(id,name,images)&order=updated_at.desc`
+  )
+}
+
+export async function getConversationMessages(conversationId: string, limit = 50) {
+  return supabaseFetch(
+    `messages?conversation_id=eq.${conversationId}&select=*,sender:profiles!messages_sender_id_fkey(id,email,full_name,avatar_url)&order=created_at.asc&limit=${limit}`
+  )
+}
+
+export async function sendChatMessage(message: {
+  conversation_id: string
+  sender_id: string
+  content: string
+}) {
+  return supabaseFetch('messages', {
+    method: 'POST',
+    body: JSON.stringify(message)
+  })
+}
+
+export async function createChatConversation(conversation: {
+  buyer_id: string
+  seller_id: string
+  product_id: string
+}) {
+  return supabaseFetch('conversations', {
+    method: 'POST',
+    body: JSON.stringify(conversation)
+  })
+}
+
+export async function markConversationAsRead(conversationId: string, userId: string) {
+  // Mark all unread messages in this conversation from other users as read
+  return supabaseFetch(`messages?conversation_id=eq.${conversationId}&sender_id=neq.${userId}&is_read=eq.false`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_read: true })
   })
 }

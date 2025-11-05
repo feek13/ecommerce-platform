@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { getProductById } from '@/lib/supabase-fetch'
+import { getProductById, getProductReviews, getProductReviewStats } from '@/lib/supabase-fetch'
 import { useCart } from '@/hooks/useCart'
 import { useAuth } from '@/hooks/useAuth'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import ReviewFilters from '@/components/review/ReviewFilters'
+import ReviewCard from '@/components/review/ReviewCard'
 import type { Product } from '@/types/database'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -27,6 +29,16 @@ export default function ProductDetailPage() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isHovering, setIsHovering] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null)
+
+  // Reviews state
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewStats, setReviewStats] = useState({
+    total: 0,
+    average: 0,
+    distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+  })
+  const [selectedRating, setSelectedRating] = useState<number | null>(null)
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   useEffect(() => {
     if (params.id) {
@@ -57,6 +69,8 @@ export default function ProductDetailPage() {
       } else {
         console.log('✅ Product loaded:', data.name)
         setProduct(data)
+        // Fetch reviews after product is loaded
+        fetchReviews(params.id as string)
       }
     } catch (error) {
       console.error('❌ Error fetching product:', error)
@@ -65,6 +79,44 @@ export default function ProductDetailPage() {
       setLoading(false)
     }
   }
+
+  const fetchReviews = async (productId: string) => {
+    try {
+      setReviewsLoading(true)
+      // Fetch all reviews for statistics
+      const statsData = await getProductReviewStats(productId)
+
+      // Calculate statistics
+      if (statsData && statsData.length > 0) {
+        const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+        let totalRating = 0
+
+        statsData.forEach((review: any) => {
+          const rating = review.rating
+          distribution[rating as keyof typeof distribution]++
+          totalRating += rating
+        })
+
+        setReviewStats({
+          total: statsData.length,
+          average: totalRating / statsData.length,
+          distribution
+        })
+      }
+
+      // Fetch reviews to display
+      const reviewsData = await getProductReviews(productId, 20)
+      setReviews(reviewsData || [])
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  const filteredReviews = selectedRating
+    ? reviews.filter((review) => review.rating === selectedRating)
+    : reviews
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -291,18 +343,18 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Rating & Reviews (Placeholder) */}
+              {/* Rating & Reviews */}
               <div className="flex items-center gap-4 mb-4 pb-4 border-b">
                 <div className="flex items-center">
                   <div className="flex text-[#FF9900]">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <svg key={star} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg key={star} className={`w-5 h-5 ${star <= Math.round(reviewStats.average) ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
                   </div>
                   <span className="ml-2 text-[#007185] hover:underline cursor-pointer">
-                    暂无评价
+                    {reviewStats.total > 0 ? `${reviewStats.total} 条评价` : '暂无评价'}
                   </span>
                 </div>
                 <span className="text-gray-400">|</span>
@@ -462,6 +514,45 @@ export default function ProductDetailPage() {
                   </svg>
                   安全交易
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">商品评价</h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left: Filters */}
+            <div className="lg:col-span-1">
+              <ReviewFilters
+                stats={reviewStats}
+                selectedRating={selectedRating}
+                onFilterChange={setSelectedRating}
+              />
+            </div>
+
+            {/* Right: Reviews List */}
+            <div className="lg:col-span-3">
+              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+                {reviewsLoading ? (
+                  <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                  </div>
+                ) : filteredReviews.length > 0 ? (
+                  <div className="divide-y">
+                    {filteredReviews.map((review) => (
+                      <ReviewCard key={review.id} review={review} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 text-sm md:text-base">
+                      {selectedRating ? '暂无该评分的评价' : '暂无评价'}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

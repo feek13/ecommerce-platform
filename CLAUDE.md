@@ -60,12 +60,15 @@ const data = await getProducts()
 - `getProducts(limit)` - Featured products ordered by sales
 - `getAllProducts(limit)` - All products with seller info
 - `getProductById(id)` - Single product with seller and category
+- `getProductsByCategory(categorySlug, limit)` - Products filtered by category slug
 - `getCategories(limit)` - Product categories
 - `getCartItems(userId)` - User's cart with product details
 - `addCartItem(userId, productId, quantity)` - Add to cart
 - `updateCartItem(itemId, quantity)` - Update cart item quantity
 - `removeCartItem(itemId)` - Remove from cart
 - `clearCartItems(userId)` - Clear entire cart
+- **Reviews**: `submitReview()`, `getProductReviews()`, `getProductReviewStats()`, `getUserReviews()`, `hasUserReviewedProduct()`
+- **Chat**: `getChatConversations()`, `getConversationMessages()`, `sendChatMessage()`, `createChatConversation()`, `markConversationAsRead()`
 
 **Guest Mode Support**: All product browsing functions work without authentication using the anon key.
 
@@ -348,6 +351,127 @@ function CategoryCard({ category, images }: { category: string; images: string[]
 - **home** (家居生活): Interior design, living spaces
 - **books** (图书音像): Bookshelves, reading environments
 
+### Category Filtering
+
+**URL-Based Filtering**: Products page supports category filtering via URL parameters.
+
+**Implementation Pattern**:
+```typescript
+// app/products/page.tsx
+import { useSearchParams } from 'next/navigation'
+import { getAllProducts, getProductsByCategory } from '@/lib/supabase-fetch'
+
+export default function ProductsPage() {
+  const searchParams = useSearchParams()
+  const category = searchParams.get('category')
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (category) {
+        // Filter by category slug
+        const data = await getProductsByCategory(category, 50)
+      } else {
+        // Get all products
+        const data = await getAllProducts(50)
+      }
+      setProducts(data || [])
+    }
+    fetchProducts()
+  }, [category])
+}
+```
+
+**Category Links**: Use `/products?category={slug}` format (e.g., `/products?category=fashion`)
+
+### Review System
+
+**Features**:
+- Users can review products from delivered orders
+- 1-5 star ratings with optional text and images
+- Filter reviews by rating (all, 5-star, 4-star, etc.)
+- Sellers can view and reply to reviews
+- Prevents duplicate reviews per order-product combination
+
+**Implementation** (`hooks/useReviews.ts` pattern):
+```typescript
+// Submit review (requires delivered order)
+await submitReview({
+  product_id: productId,
+  order_id: orderId,
+  user_id: userId,
+  rating: 5,
+  content: 'Great product!',
+  images: ['url1', 'url2']
+})
+
+// Check if user already reviewed
+const hasReviewed = await hasUserReviewedProduct(userId, productId, orderId)
+
+// Get product reviews with pagination
+const reviews = await getProductReviews(productId, limit, offset)
+
+// Get review statistics
+const stats = await getProductReviewStats(productId)
+```
+
+**UI Components**:
+- `ReviewForm.tsx` - Submit reviews with rating, text, and image uploads
+- `ReviewList.tsx` - Display reviews with filtering
+- `ReviewStats.tsx` - Show rating distribution
+
+### Chat System
+
+**Architecture**: Real-time messaging between buyers and sellers, conversation-based.
+
+**useChat Hook** (`hooks/useChat.ts`):
+```typescript
+const {
+  conversations,        // List of user's conversations
+  currentConversation,  // Selected conversation
+  messages,            // Messages in current conversation
+  loading,
+  messagesLoading,
+  sending,
+  selectConversation,  // Switch conversation
+  sendMessage,         // Send message
+  createConversation,  // Start new conversation
+  getUnreadCount       // Badge count
+} = useChat(userId)
+```
+
+**Database Schema**:
+- `conversations` table: Links buyer, seller, and product
+- `messages` table: Stores message content with `is_read` flag
+- Foreign keys: `conversations_buyer_id_fkey`, `conversations_seller_id_fkey`, `conversations_product_id_fkey`
+
+**Important**: Table names are `conversations` and `messages` (NOT `chat_conversations`/`chat_messages`)
+
+**UI Pages**:
+- `/chat` - Buyer's chat interface (contact sellers)
+- `/seller/chat` - Seller's chat interface (respond to buyers)
+- Responsive: Desktop shows split view, mobile shows list/chat toggle
+
+**Mobile-First Pattern**:
+```typescript
+const [isMobile, setIsMobile] = useState(false)
+const [showConversationList, setShowConversationList] = useState(true)
+
+// Toggle between list and chat on mobile
+const handleSelectConversation = (conversation) => {
+  selectConversation(conversation)
+  if (isMobile) {
+    setShowConversationList(false) // Show chat window
+  }
+}
+
+const handleBack = () => {
+  setShowConversationList(true) // Back to list
+  selectConversation(null)
+}
+```
+
+**Dependencies**: Requires `date-fns` for timestamp formatting (`formatDistanceToNow`)
+
 ## Database Schema
 
 ### profiles
@@ -421,6 +545,42 @@ INSERT INTO categories (name, slug, description, display_order) VALUES
 - `shipping_address` (jsonb)
 - `created_at`, `updated_at` (timestamptz)
 
+### order_items
+- `id` (bigint, PK)
+- `order_id` (bigint, FK to orders)
+- `product_id` (bigint, FK to products)
+- `quantity` (integer)
+- `price` (numeric) - Price at time of purchase
+- `created_at` (timestamptz)
+
+### reviews
+- `id` (bigint, PK)
+- `product_id` (bigint, FK to products)
+- `order_id` (bigint, FK to orders)
+- `user_id` (uuid, FK to profiles)
+- `rating` (integer) - 1 to 5 stars
+- `content` (text) - Optional review text
+- `images` (text array) - Optional review images
+- `created_at`, `updated_at` (timestamptz)
+- **Constraint**: Unique combination of (user_id, product_id, order_id) to prevent duplicate reviews
+
+### conversations
+- `id` (uuid, PK)
+- `buyer_id` (uuid, FK to profiles)
+- `seller_id` (uuid, FK to profiles)
+- `product_id` (bigint, FK to products)
+- `last_message` (text) - Cached for list display
+- `last_message_at` (timestamptz) - For sorting
+- `created_at`, `updated_at` (timestamptz)
+
+### messages
+- `id` (uuid, PK)
+- `conversation_id` (uuid, FK to conversations)
+- `sender_id` (uuid, FK to profiles)
+- `content` (text)
+- `is_read` (boolean)
+- `created_at` (timestamptz)
+
 ## Current Implementation Status
 
 ### ✅ Fully Implemented
@@ -435,10 +595,14 @@ INSERT INTO categories (name, slug, description, display_order) VALUES
 - **Seller orders management** (`/seller/orders`) - view orders containing seller's products
 - **Seller reviews management** (`/seller/reviews`) - view and reply to product reviews
 - **Seller settings** (`/seller/settings`) - profile and address management
-- Product browsing (`/products`) with seller status warnings
+- **Seller chat** (`/seller/chat`) - messaging system with buyers
+- Product browsing (`/products`) with seller status warnings and **category filtering**
+- **Product reviews** - submit, view, filter by rating
+- **Buyer chat** (`/chat`) - contact sellers about products
+- **Order management** (`/orders`) - view order history, status tracking, submit reviews
 - Toast notification system
 - Independent admin login
-- **Category-based product organization**
+- **Category-based product organization** with URL parameter filtering
 - **Guest mode** - browse products without login
 - **Homepage category carousel** - auto-rotating image cards
 - **Cart functionality** - add/remove/update with direct fetch workaround
@@ -446,9 +610,8 @@ INSERT INTO categories (name, slug, description, display_order) VALUES
 - **Responsive design** - mobile-first approach across all pages
 
 ### 🚧 Placeholder/Partial
-- Checkout flow (order creation UI incomplete)
+- Checkout flow (functional but basic UI)
 - Payment integration (mocked)
-- Chat (database schema only)
 
 ## Common Issues & Solutions
 
@@ -543,6 +706,40 @@ function getUserToken(): string | null {
 // Then display order.user_id directly in UI
 ```
 
+### Chat Table Name Errors
+**Symptoms**: `Could not find the table 'public.chat_conversations'` or `'public.chat_messages'`
+**Cause**: Code using `chat_conversations`/`chat_messages` but database tables are `conversations`/`messages`
+**Fix**: Use correct table names without `chat_` prefix:
+```typescript
+// ❌ WRONG
+supabaseFetch('chat_conversations?...')
+supabaseFetch('chat_messages?...')
+
+// ✅ CORRECT
+supabaseFetch('conversations?...')
+supabaseFetch('messages?...')
+```
+
+### Chat Foreign Key Explicit Specification
+**Symptoms**: `Could not find a relationship between 'conversations' and 'products'`
+**Cause**: PostgREST cannot auto-detect the FK relationship
+**Fix**: Explicitly specify the foreign key name:
+```typescript
+// ❌ WRONG - implicit relationship
+.select('*, product:products(id,name,images)')
+
+// ✅ CORRECT - explicit FK
+.select('*, product:products!conversations_product_id_fkey(id,name,images)')
+```
+
+### Missing date-fns Dependency
+**Symptoms**: `Module not found: Can't resolve 'date-fns'` in chat components
+**Cause**: Chat UI uses `formatDistanceToNow` from date-fns for timestamps
+**Fix**: Install the package:
+```bash
+npm install date-fns
+```
+
 ## File Structure
 
 ```
@@ -563,14 +760,18 @@ app/
 │   │   └── [id]/edit/page.tsx     # Edit product
 │   ├── orders/page.tsx            # Orders containing seller's products
 │   ├── reviews/page.tsx           # Product reviews management
+│   ├── chat/page.tsx              # Seller chat with buyers
 │   ├── settings/page.tsx          # Seller profile settings
 │   └── page.tsx                   # Seller dashboard
 ├── apply-seller/page.tsx          # Seller application form
 ├── profile/page.tsx               # User profile + seller status
 ├── products/
-│   ├── page.tsx                   # Browse all products
-│   └── [id]/page.tsx              # Product detail page
+│   ├── page.tsx                   # Browse all products (with category filtering)
+│   └── [id]/page.tsx              # Product detail page with reviews
+├── orders/page.tsx                # User order history (submit reviews)
 ├── cart/page.tsx                  # Shopping cart
+├── checkout/page.tsx              # Checkout flow
+├── chat/page.tsx                  # Buyer chat with sellers
 ├── page.tsx                       # Homepage with category carousel
 └── providers/
     ├── AuthProvider.tsx           # Global auth state
@@ -582,8 +783,20 @@ components/
 │   └── Footer.tsx                 # Site footer
 ├── product/
 │   └── ProductCard.tsx            # Product card with seller status badge
+├── review/
+│   ├── ReviewForm.tsx             # Submit review form
+│   ├── ReviewList.tsx             # Display reviews with filtering
+│   └── ReviewStats.tsx            # Rating distribution display
+├── chat/
+│   ├── ConversationList.tsx       # List of conversations
+│   └── ChatWindow.tsx             # Message display and input
 └── ui/
     └── Toast.tsx                  # Notification component
+
+hooks/
+├── useAuth.ts                     # Authentication hook
+├── useCart.ts                     # Shopping cart hook
+└── useChat.ts                     # Chat messaging hook
 
 lib/
 ├── supabase.ts                    # Standard Supabase client (auth only)
@@ -610,6 +823,9 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 - **Hot Reload**: Fast Refresh enabled, full reloads on provider changes
 - **Database**: Run SQL scripts in Supabase SQL Editor, not via API (RLS policies block API inserts)
 - **Adding Products**: Use UI at `/seller/products/new` or SQL scripts in Supabase dashboard
+- **Scripts**: Node.js scripts in `/scripts` folder for database operations (require `dotenv` package)
+  - Scripts will fail with RLS errors - always use SQL Editor for batch operations
+  - See `add-more-products.sql` for example batch product insertion
 
 ## Initial Setup
 
