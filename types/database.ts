@@ -79,6 +79,8 @@ export interface Product {
   rating_count: number
   created_at: string
   updated_at: string
+  seller?: Profile
+  category?: Category
 }
 
 export interface ProductVariant {
