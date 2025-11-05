@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { getAllProducts, getProductsByCategory } from '@/lib/supabase-fetch'
@@ -10,7 +10,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { useAuth } from '@/hooks/useAuth'
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams()
   const category = searchParams.get('category')
   const [products, setProducts] = useState<Product[]>([])
@@ -113,5 +113,21 @@ export default function ProductsPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#EAEDED]">
+        <Header />
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        </div>
+        <Footer />
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   )
 }
