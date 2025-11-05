@@ -1,17 +1,8 @@
 import Link from 'next/link'
 import type { Product } from '@/types/database'
 
-// Extended Product type with seller info
-interface ProductWithSeller extends Product {
-  seller?: {
-    id: string
-    role: string
-    full_name: string | null
-  }
-}
-
 interface ProductCardProps {
-  product: ProductWithSeller
+  product: Product
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
