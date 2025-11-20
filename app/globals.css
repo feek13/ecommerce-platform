@@ -1,160 +1,153 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
+
+
 
 :root {
-  --border: 214 32% 91%;
+  /* Base Colors - Slate/Zinc based for a premium feel */
   --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  --foreground: 240 10% 3.9%;
+
+  /* Card & Popovers */
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+
+  /* Primary - Violet/Purple based for the brand */
+  --primary: 262.1 83.3% 57.8%;
+  --primary-foreground: 210 40% 98%;
+
+  /* Secondary - Slate */
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+
+  /* Muted */
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+
+  /* Accent */
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+
+  /* Destructive */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* Borders & Inputs */
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 262.1 83.3% 57.8%;
+
+  /* Radius */
+  --radius: 0.75rem;
 }
 
-* {
-  scroll-behavior: smooth;
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 263.4 70% 50.4%;
 }
 
-body {
-  background-color: white;
-  color: rgb(17 24 39);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'rlig' 1, 'calt' 1;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-/* Custom scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgb(243 244 246);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(156 163 175);
-  border-radius: 9999px;
+  @apply bg-muted-foreground/20 rounded-full transition-colors;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(107 114 128);
+  @apply bg-muted-foreground/40;
 }
 
-/* Hide scrollbar utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Utilities */
+.glass {
+  @apply bg-white/80 dark:bg-black/80 backdrop-blur-md border border-white/20;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+.glass-card {
+  @apply bg-white/50 dark:bg-black/50 backdrop-blur-sm border border-white/10 shadow-xl;
 }
 
-/* Selection styles */
-::selection {
-  background-color: rgb(233 213 255);
-  color: rgb(88 28 135);
-}
-
-/* Focus styles */
-*:focus-visible {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px white, 0 0 0 4px rgb(168 85 247);
-}
-
-/* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(to right, rgb(147 51 234), rgb(236 72 153));
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500;
 }
 
-/* Animation utilities */
-@keyframes fade-in {
+/* Animations */
+@keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
 }
 
-@keyframes slide-in {
+@keyframes scale-in {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: scale(0.95);
   }
+
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: scale(1);
   }
 }
 
-.animate-slide-in {
-  animation: slide-in 0.3s ease-out;
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
 }
 
-@keyframes slide-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-left {
-  animation: slide-in-left 0.3s ease-out;
-}
-
-/* Glass morphism */
-.glass {
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-}
-
-/* Product image carousel animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes progress {
-  from {
-    stroke-dashoffset: 44;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Modal animations */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+/* Selection */
+::selection {
+  @apply bg-primary/20 text-primary;
 }

@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { PackageIcon, WarningIcon } from '@/components/icons/Icons'
 
 export default function CartPage() {
   const router = useRouter()
@@ -110,8 +111,8 @@ export default function CartPage() {
                               className="w-full h-full object-contain"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl md:text-4xl">
-                              📦
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <PackageIcon size={48} />
                             </div>
                           )}
                         </Link>
@@ -139,7 +140,7 @@ export default function CartPage() {
                           {/* Seller Warning */}
                           {item.product?.seller && item.product.seller.role !== 'seller' && (
                             <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mb-2 inline-flex items-center gap-1 text-xs">
-                              <span className="text-yellow-600">⚠️</span>
+                              <WarningIcon className="text-yellow-600 w-4 h-4" />
                               <span className="text-yellow-800">商家被审查中</span>
                             </div>
                           )}

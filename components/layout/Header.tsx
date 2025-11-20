@@ -4,13 +4,33 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
+import {
+  Smartphone,
+  Shirt,
+  Home,
+  Apple,
+  Sparkles,
+  Dumbbell,
+  BookOpen,
+  Baby,
+  Menu,
+  Search,
+  ShoppingCart,
+  User,
+  Package,
+  ChevronDown,
+  ChevronRight,
+  X,
+  Flame,
+  LayoutGrid
+} from 'lucide-react'
 
 // 分类数据结构
 const categories = [
   {
     id: 'electronics',
     name: '电子产品',
-    icon: '📱',
+    icon: <Smartphone className="w-5 h-5" />,
     subcategories: [
       { name: '手机通讯', items: ['智能手机', '老人机', '对讲机', '手机配件'] },
       { name: '电脑办公', items: ['笔记本', '台式机', '平板电脑', 'DIY硬件'] },
@@ -20,7 +40,7 @@ const categories = [
   {
     id: 'fashion',
     name: '服装鞋包',
-    icon: '👔',
+    icon: <Shirt className="w-5 h-5" />,
     subcategories: [
       { name: '女装', items: ['连衣裙', 'T恤', '裤装', '外套'] },
       { name: '男装', items: ['衬衫', 'T恤', '裤装', '外套'] },
@@ -31,7 +51,7 @@ const categories = [
   {
     id: 'home',
     name: '家居生活',
-    icon: '🏠',
+    icon: <Home className="w-5 h-5" />,
     subcategories: [
       { name: '家具', items: ['沙发', '床', '桌椅', '柜子'] },
       { name: '家纺', items: ['床上用品', '窗帘', '地毯', '毛巾'] },
@@ -41,7 +61,7 @@ const categories = [
   {
     id: 'food',
     name: '食品生鲜',
-    icon: '🍎',
+    icon: <Apple className="w-5 h-5" />,
     subcategories: [
       { name: '休闲食品', items: ['零食', '坚果', '饼干', '糖果'] },
       { name: '水果蔬菜', items: ['新鲜水果', '新鲜蔬菜', '进口水果'] },
@@ -51,7 +71,7 @@ const categories = [
   {
     id: 'beauty',
     name: '美妆个护',
-    icon: '💄',
+    icon: <Sparkles className="w-5 h-5" />,
     subcategories: [
       { name: '面部护肤', items: ['洁面', '爽肤水', '面霜', '面膜'] },
       { name: '彩妆', items: ['口红', '粉底', '眼影', '睫毛膏'] },
@@ -61,7 +81,7 @@ const categories = [
   {
     id: 'sports',
     name: '运动户外',
-    icon: '⚽',
+    icon: <Dumbbell className="w-5 h-5" />,
     subcategories: [
       { name: '运动服饰', items: ['运动鞋', '运动服', '运动内衣', '运动配件'] },
       { name: '健身器材', items: ['跑步机', '哑铃', '瑜伽垫', '动感单车'] },
@@ -71,7 +91,7 @@ const categories = [
   {
     id: 'books',
     name: '图书音像',
-    icon: '📚',
+    icon: <BookOpen className="w-5 h-5" />,
     subcategories: [
       { name: '图书', items: ['小说', '文学', '经管', '科技'] },
       { name: '电子书', items: ['Kindle电子书', '网络小说', '有声读物'] },
@@ -81,7 +101,7 @@ const categories = [
   {
     id: 'kids',
     name: '母婴玩具',
-    icon: '👶',
+    icon: <Baby className="w-5 h-5" />,
     subcategories: [
       { name: '奶粉辅食', items: ['婴儿奶粉', '营养辅食', '宝宝零食'] },
       { name: '纸尿裤', items: ['婴儿纸尿裤', '拉拉裤', '尿布'] },
@@ -124,28 +144,48 @@ export default function Header() {
   }, [categoryMenuOpen])
 
   return (
-    <header className="bg-[#232F3E]">
+    <header className="bg-[#232F3E] sticky top-0 z-50 shadow-md">
       {/* Main Navigation */}
-      <div className="flex items-center h-[60px] px-4 gap-2 md:gap-4">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden text-white p-2 hover:bg-[#37475A] rounded transition"
-          aria-label="打开菜单"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+      <div className="flex flex-col md:flex-row md:items-center md:h-[60px] px-4 gap-2 md:gap-4 py-2 md:py-0">
+        {/* Top Row: Menu, Logo, Cart (Mobile) */}
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center gap-2">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden text-white p-2 hover:bg-[#37475A] rounded transition"
+              aria-label="打开菜单"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <div className="text-white font-bold text-base md:text-xl px-2 py-1 border border-transparent hover:border-white transition">
-            <span className="text-[#FF9900]">电商</span>平台
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <div className="text-white font-bold text-base md:text-xl px-2 py-1 border border-transparent hover:border-white transition">
+                <span className="text-[#FF9900]">电商</span>平台
+              </div>
+            </Link>
           </div>
-        </Link>
 
-        {/* Deliver to */}
+          {/* Cart (Visible on Mobile in Top Row) */}
+          <div className="md:hidden">
+            <Link
+              href="/cart"
+              className="flex items-center text-white px-2 py-1 border border-transparent hover:border-white transition relative"
+            >
+              <div className="relative">
+                <ShoppingCart className="w-7 h-7" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#FF9900] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Deliver to (Desktop Only) */}
         <div className="hidden md:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition cursor-pointer">
           <div>
             <div className="text-xs text-gray-300">配送至</div>
@@ -153,8 +193,8 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-3xl">
+        {/* Search Bar (Full width on mobile row 2, Flex on desktop) */}
+        <form onSubmit={handleSearch} className="w-full md:flex-1 max-w-3xl">
           <div className="flex h-10 rounded-lg overflow-hidden shadow-sm">
             <select className="hidden md:block bg-gray-100 border-none rounded-l px-3 text-sm text-gray-900 font-medium hover:bg-gray-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF9900]">
               <option>全部</option>
@@ -175,68 +215,66 @@ export default function Header() {
               type="submit"
               className="bg-[#FEBD69] hover:bg-[#F3A847] px-6 rounded-r transition-colors duration-200 flex items-center justify-center"
             >
-              <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="w-5 h-5 text-gray-900" />
             </button>
           </div>
         </form>
 
-        {/* Account & Orders */}
-        {user ? (
-          <Link
-            href="/profile"
-            className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
-          >
-            <div>
-              <div className="text-xs">
-                你好, {profile?.full_name || profile?.email?.split('@')[0]}
+        {/* Account & Orders (Desktop Only) */}
+        <div className="hidden md:flex items-center gap-2">
+          {user ? (
+            <Link
+              href="/profile"
+              className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
+            >
+              <div>
+                <div className="text-xs">
+                  你好, {profile?.full_name || profile?.email?.split('@')[0]}
+                </div>
+                <div className="font-bold">账户与订单</div>
               </div>
-              <div className="font-bold">账户与订单</div>
-            </div>
-          </Link>
-        ) : (
-          <Link
-            href="/login"
-            className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
-          >
-            <div>
-              <div className="text-xs">你好, 访客</div>
-              <div className="font-bold">登录</div>
-            </div>
-          </Link>
-        )}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
+            >
+              <div>
+                <div className="text-xs">你好, 访客</div>
+                <div className="font-bold">登录</div>
+              </div>
+            </Link>
+          )}
 
-        {/* Returns & Orders */}
-        {user && (
-          <Link
-            href="/orders"
-            className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
-          >
-            <div>
-              <div className="text-xs">退货</div>
-              <div className="font-bold">与订单</div>
-            </div>
-          </Link>
-        )}
+          {/* Returns & Orders */}
+          {user && (
+            <Link
+              href="/orders"
+              className="hidden lg:flex items-center text-white text-sm px-2 py-1 border border-transparent hover:border-white transition"
+            >
+              <div>
+                <div className="text-xs">退货</div>
+                <div className="font-bold">与订单</div>
+              </div>
+            </Link>
+          )}
 
-        {/* Cart */}
-        <Link
-          href="/cart"
-          className="flex items-center text-white px-2 py-1 border border-transparent hover:border-white transition relative"
-        >
-          <div className="relative">
-            <svg className="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#FF9900] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </div>
-          <span className="ml-2 font-bold hidden sm:inline">购物车</span>
-        </Link>
+          {/* Cart (Desktop Only) */}
+          <Link
+            href="/cart"
+            className="flex items-center text-white px-2 py-1 border border-transparent hover:border-white transition relative"
+          >
+            <div className="relative">
+              <ShoppingCart className="w-7 h-7 md:w-8 md:h-8" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#FF9900] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </div>
+            <span className="ml-2 font-bold hidden sm:inline">购物车</span>
+          </Link>
+        </div>
       </div>
 
       {/* Category Navigation */}
@@ -248,18 +286,11 @@ export default function Header() {
               onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
               className="flex items-center gap-1 px-2 py-1 border border-transparent hover:border-white transition"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Menu className="w-5 h-5" />
               <span className="whitespace-nowrap">全部分类</span>
-              <svg
+              <ChevronDown
                 className={`w-4 h-4 transition-transform ${categoryMenuOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              />
             </button>
 
             {/* 下拉菜单 */}
@@ -275,18 +306,15 @@ export default function Header() {
                     >
                       <Link
                         href={`/products?category=${category.id}`}
-                        className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition border-l-4 ${
-                          hoveredCategory === category.id
-                            ? 'border-purple-600 bg-purple-50 text-purple-600'
-                            : 'border-transparent'
-                        }`}
+                        className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition border-l-4 ${hoveredCategory === category.id
+                          ? 'border-purple-600 bg-purple-50 text-purple-600'
+                          : 'border-transparent'
+                          }`}
                         onClick={() => setCategoryMenuOpen(false)}
                       >
                         <span className="text-xl">{category.icon}</span>
                         <span className="font-medium flex-1">{category.name}</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <ChevronRight className="w-4 h-4" />
                       </Link>
                     </div>
                   ))}
@@ -342,18 +370,16 @@ export default function Header() {
         <>
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Sidebar */}
-          <div className="fixed top-0 left-0 h-full w-80 bg-white z-50 shadow-2xl overflow-y-auto lg:hidden animate-slide-in-left">
+          <div className="fixed top-0 left-0 h-full w-[85vw] max-w-[320px] bg-white z-50 shadow-2xl overflow-y-auto lg:hidden animate-slide-in-left">
             {/* Sidebar Header */}
             <div className="bg-[#232F3E] text-white p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <User className="w-8 h-8" />
                 <div>
                   {user ? (
                     <>
@@ -380,9 +406,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-1 hover:bg-[#37475A] rounded transition"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -396,9 +420,7 @@ export default function Header() {
                     className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <User className="w-5 h-5" />
                     <span>我的账户</span>
                   </Link>
                   <Link
@@ -406,9 +428,7 @@ export default function Header() {
                     className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
+                    <Package className="w-5 h-5" />
                     <span>我的订单</span>
                   </Link>
                   <div className="border-t border-gray-200 my-2" />
@@ -421,14 +441,13 @@ export default function Header() {
                 className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                </svg>
+                <Flame className="w-5 h-5 text-orange-500" />
                 <span>热门商品</span>
               </Link>
 
               {/* All Categories */}
-              <div className="px-4 py-3 text-sm font-bold text-gray-500 uppercase">
+              <div className="px-4 py-3 text-sm font-bold text-gray-500 uppercase flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4" />
                 商品分类
               </div>
               {categories.map((category) => (
@@ -438,16 +457,14 @@ export default function Header() {
                   className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span className="text-2xl">{category.icon}</span>
+                  <span className="text-gray-500">{category.icon}</span>
                   <div className="flex-1">
                     <div className="font-medium">{category.name}</div>
                     <div className="text-xs text-gray-500">
                       {category.subcategories.length} 个子分类
                     </div>
                   </div>
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
                 </Link>
               ))}
             </div>

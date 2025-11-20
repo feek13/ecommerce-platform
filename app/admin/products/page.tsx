@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { WarningIcon } from '@/components/icons/Icons'
 
 type Product = {
   id: number
@@ -349,8 +350,9 @@ export default function AdminProductsPage() {
                         </p>
                         <p className="text-xs text-gray-500">{product.seller?.email}</p>
                         {product.seller?.role !== 'seller' && (
-                          <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded">
-                            ⚠️ 商家已下线
+                          <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded">
+                            <WarningIcon className="w-3 h-3" />
+                            商家已下线
                           </span>
                         )}
                       </div>

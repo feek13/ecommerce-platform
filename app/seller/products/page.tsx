@@ -208,7 +208,7 @@ export default function SellerProductsPage() {
                 <div className="p-3 flex gap-3">
                   <div className="h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     <img
-                      src={product.images?.[0] || 'https://via.placeholder.com/100'}
+                      src={product.images?.[0] || '/placeholder.svg'}
                       alt={product.name}
                       className="h-full w-full object-cover"
                     />
@@ -316,7 +316,7 @@ export default function SellerProductsPage() {
                       <div className="flex items-center">
                         <div className="h-12 w-12 lg:h-16 lg:w-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                           <img
-                            src={product.images?.[0] || 'https://via.placeholder.com/100'}
+                            src={product.images?.[0] || '/placeholder.svg'}
                             alt={product.name}
                             className="h-full w-full object-cover"
                           />
@@ -400,7 +400,7 @@ export default function SellerProductsPage() {
                   {/* Product Image and Info */}
                   <div className="h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     <img
-                      src={product.images?.[0] || 'https://via.placeholder.com/100'}
+                      src={product.images?.[0] || '/placeholder.svg'}
                       alt={product.name}
                       className="h-full w-full object-cover"
                     />

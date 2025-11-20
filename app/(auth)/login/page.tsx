@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabaseAuth } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { WarningIcon } from '@/components/icons/Icons'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -92,7 +93,7 @@ export default function LoginPage() {
           {error && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
               <div className="flex items-center">
-                <span className="text-red-600 mr-2">⚠️</span>
+                <WarningIcon className="text-red-600 w-5 h-5 mr-2" />
                 <p className="text-red-800 text-sm">{error}</p>
               </div>
             </div>

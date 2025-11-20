@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer'
 import ProductCard from '@/components/product/ProductCard'
 import type { Product, Category } from '@/types/database'
 import Link from 'next/link'
+import { CategoryIcons, FunctionalIcons } from '@/components/icons/Icons'
 
 // 分类轮播图片数据
 const categoryImages = {
@@ -49,11 +50,30 @@ function CategoryCard({ category, images }: { category: string; images: string[]
   }, [images.length, isHovering])
 
   const categoryInfo = {
-    electronics: { name: '电子产品', icon: '📱', desc: '手机、电脑、相机等' },
-    fashion: { name: '服装鞋包', icon: '👕', desc: '时尚潮流服饰配饰' },
-    home: { name: '家居生活', icon: '🏠', desc: '家具、家纺、厨具等' },
-    books: { name: '图书音像', icon: '📚', desc: '图书、音乐、影视作品' },
-  }[category] || { name: '', icon: '', desc: '' }
+    electronics: {
+      name: '电子产品',
+      Icon: CategoryIcons.electronics,
+      desc: '手机、电脑、相机等'
+    },
+    fashion: {
+      name: '服装鞋包',
+      Icon: CategoryIcons.fashion,
+      desc: '时尚潮流服饰配饰'
+    },
+    home: {
+      name: '家居生活',
+      Icon: CategoryIcons.home,
+      desc: '家具、家纺、厨具等'
+    },
+    books: {
+      name: '图书音像',
+      Icon: CategoryIcons.books,
+      desc: '图书、音乐、影视作品'
+    },
+  }[category as keyof typeof categoryImages]
+
+  if (!categoryInfo) return null
+  const { name, Icon, desc } = categoryInfo
 
   return (
     <Link
@@ -69,11 +89,10 @@ function CategoryCard({ category, images }: { category: string; images: string[]
             key={image}
             src={image}
             alt={`${categoryInfo.name} ${index + 1}`}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${
-              index === currentImage
-                ? 'opacity-100 scale-100 group-hover:scale-110'
-                : 'opacity-0 scale-105'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${index === currentImage
+              ? 'opacity-100 scale-100 group-hover:scale-110'
+              : 'opacity-0 scale-105'
+              }`}
           />
         ))}
 
@@ -83,10 +102,10 @@ function CategoryCard({ category, images }: { category: string; images: string[]
         {/* 内容 */}
         <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-6 text-white">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-            <span className="text-xl sm:text-2xl md:text-3xl">{categoryInfo.icon}</span>
-            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold">{categoryInfo.name}</h3>
+            <Icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
+            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold">{name}</h3>
           </div>
-          <p className="text-xs sm:text-sm text-gray-200 mb-2 sm:mb-3">{categoryInfo.desc}</p>
+          <p className="text-xs sm:text-sm text-gray-200 mb-2 sm:mb-3">{desc}</p>
           <span className="inline-flex items-center gap-1.5 sm:gap-2 text-[#FFD814] text-xs sm:text-sm md:text-base font-semibold group-hover:gap-3 transition-all">
             立即选购
             <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,11 +123,10 @@ function CategoryCard({ category, images }: { category: string; images: string[]
                 e.preventDefault()
                 setCurrentImage(index)
               }}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentImage
-                  ? 'bg-white w-6'
-                  : 'bg-white/50 hover:bg-white/80'
-              }`}
+              className={`w-2 h-2 rounded-full transition-all ${index === currentImage
+                ? 'bg-white w-6'
+                : 'bg-white/50 hover:bg-white/80'
+                }`}
             />
           ))}
         </div>
@@ -154,23 +172,30 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Banner */}
-      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px]">
+      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 h-[400px] sm:h-[300px] md:h-[350px] lg:h-[400px] overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent animate-blob"></div>
+
         <div className="relative max-w-[1500px] mx-auto px-4 h-full flex items-center">
-          <div className="text-white max-w-xl">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4">欢迎来到电商平台</h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-5 md:mb-6">发现您喜爱的商品，享受便捷购物体验</p>
+          <div className="text-white max-w-xl pt-10 sm:pt-0 animate-fade-in-up">
+            <h1 className="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-3 md:mb-4 tracking-tight">
+              欢迎来到<span className="text-[#FF9900]">电商平台</span>
+            </h1>
+            <p className="text-base sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-5 md:mb-6 text-gray-100 leading-relaxed">
+              发现您喜爱的商品，享受便捷购物体验
+            </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 href="/products"
-                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-[#FF9900] text-gray-900 font-bold rounded hover:bg-[#F3A847] transition text-center text-sm sm:text-base"
+                className="px-8 py-3.5 bg-[#FF9900] text-gray-900 font-bold rounded-full hover:bg-[#F3A847] transition-transform active:scale-95 shadow-lg shadow-orange-500/30 text-center text-base"
               >
                 立即购物
               </Link>
               {!user && (
                 <Link
                   href="/signup"
-                  className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white text-gray-900 font-bold rounded hover:bg-gray-100 transition text-center text-sm sm:text-base"
+                  className="px-8 py-3.5 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white/20 transition-transform active:scale-95 text-center text-base"
                 >
                   注册账号
                 </Link>
@@ -180,15 +205,24 @@ export default function HomePage() {
         </div>
       </div>
 
-      <main className="max-w-[1500px] mx-auto px-4 -mt-12 sm:-mt-16 md:-mt-20 relative z-10">
+      <main className="max-w-[1500px] mx-auto px-4 mt-6 sm:-mt-16 md:-mt-20 relative z-10 pb-20">
         {/* Category Carousel */}
         <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-              <CategoryCard category="electronics" images={categoryImages.electronics} />
-              <CategoryCard category="fashion" images={categoryImages.fashion} />
-              <CategoryCard category="home" images={categoryImages.home} />
-              <CategoryCard category="books" images={categoryImages.books} />
+          {/* Mobile: Horizontal Scroll, Desktop: Grid */}
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+            <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 divide-x divide-gray-100 scrollbar-hide">
+              <div className="min-w-[85vw] sm:min-w-[50vw] md:min-w-0 snap-center">
+                <CategoryCard category="electronics" images={categoryImages.electronics} />
+              </div>
+              <div className="min-w-[85vw] sm:min-w-[50vw] md:min-w-0 snap-center">
+                <CategoryCard category="fashion" images={categoryImages.fashion} />
+              </div>
+              <div className="min-w-[85vw] sm:min-w-[50vw] md:min-w-0 snap-center">
+                <CategoryCard category="home" images={categoryImages.home} />
+              </div>
+              <div className="min-w-[85vw] sm:min-w-[50vw] md:min-w-0 snap-center">
+                <CategoryCard category="books" images={categoryImages.books} />
+              </div>
             </div>
           </div>
         </div>
@@ -214,7 +248,9 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">📦</div>
+              <div className="flex justify-center mb-4">
+                <FunctionalIcons.package className="w-24 h-24 text-gray-400" size={96} />
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 暂无商品
               </h3>
@@ -274,28 +310,36 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="text-5xl mb-3">🚚</div>
+              <div className="flex justify-center mb-3">
+                <FunctionalIcons.truck className="w-16 h-16 text-primary" size={64} />
+              </div>
               <h3 className="font-bold text-gray-900 mb-2">快速配送</h3>
               <p className="text-sm text-gray-600">
                 次日达服务，让您更快收到商品
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-3">💳</div>
+              <div className="flex justify-center mb-3">
+                <FunctionalIcons.creditCard className="w-16 h-16 text-primary" size={64} />
+              </div>
               <h3 className="font-bold text-gray-900 mb-2">安全支付</h3>
               <p className="text-sm text-gray-600">
                 多种支付方式，交易更安全
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-3">🔄</div>
+              <div className="flex justify-center mb-3">
+                <FunctionalIcons.refresh className="w-16 h-16 text-primary" size={64} />
+              </div>
               <h3 className="font-bold text-gray-900 mb-2">7天无理由退货</h3>
               <p className="text-sm text-gray-600">
                 不满意可退换，购物更放心
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-3">💬</div>
+              <div className="flex justify-center mb-3">
+                <FunctionalIcons.chat className="w-16 h-16 text-primary" size={64} />
+              </div>
               <h3 className="font-bold text-gray-900 mb-2">在线客服</h3>
               <p className="text-sm text-gray-600">
                 7×24小时在线服务，随时解答

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseAuth } from '@/lib/supabase'
 import Toast from '@/components/ui/Toast'
+import { InfoIcon } from '@/components/icons/Icons'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -120,7 +121,7 @@ export default function AdminLoginPage() {
           {/* Info */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <div className="flex items-start gap-2">
-              <span className="text-blue-600 mt-0.5">ℹ️</span>
+              <InfoIcon className="text-blue-600 w-5 h-5 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-blue-800">
                 <p className="font-medium mb-1">提示</p>
                 <ul className="space-y-1 text-xs">

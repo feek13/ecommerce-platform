@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Product } from '@/types/database'
+import { WarningIcon } from '@/components/icons/Icons'
 
 interface ProductCardProps {
   product: Product
@@ -24,7 +25,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           alt={product.name}
           className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
-            e.currentTarget.src = 'https://via.placeholder.com/400x400?text=No+Image'
+            e.currentTarget.src = '/placeholder.svg'
           }}
         />
         {discountPercent > 0 && (
@@ -39,7 +40,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
         {product.seller && product.seller.role !== 'seller' && (
           <div className="absolute bottom-2 md:bottom-3 left-2 md:left-3 bg-yellow-500 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full shadow-lg flex items-center gap-0.5 md:gap-1">
-            ⚠️ 商家被审查中
+            <WarningIcon className="w-3 h-3 md:w-4 md:h-4" />
+            <span>商家被审查中</span>
           </div>
         )}
         {product.stock === 0 && (
