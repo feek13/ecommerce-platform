@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getAllProducts, getProductsByCategory } from '@/lib/supabase-fetch'
 import type { Product } from '@/types/database'
 import ProductCard from '@/components/product/ProductCard'
+import ProductSkeleton from '@/components/ui/ProductSkeleton'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { useAuth } from '@/hooks/useAuth'
@@ -66,12 +67,8 @@ function ProductsContent() {
           </div>
         )}
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-          </div>
-        )}
+        {/* Loading State - Elegant Skeleton */}
+        {loading && <ProductSkeleton count={10} />}
 
         {/* Error State */}
         {error && (
@@ -121,9 +118,15 @@ export default function ProductsPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-[#EAEDED]">
         <Header />
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
+        <main className="max-w-[1500px] mx-auto px-4 py-4 md:py-6">
+          {/* Breadcrumb skeleton */}
+          <div className="text-xs md:text-sm text-gray-700 mb-3 md:mb-4">
+            <span>首页</span>
+            <span className="mx-1.5 md:mx-2">›</span>
+            <span className="font-semibold">所有商品</span>
+          </div>
+          <ProductSkeleton count={10} />
+        </main>
         <Footer />
       </div>
     }>

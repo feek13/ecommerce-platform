@@ -9,7 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-playfair)', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -45,6 +46,31 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Profile Page - Deep Charcoal Elegance
+        charcoal: {
+          900: "hsl(var(--profile-bg-primary))",
+          800: "hsl(var(--profile-bg-secondary))",
+          700: "hsl(var(--profile-bg-tertiary))",
+          600: "hsl(var(--profile-bg-elevated))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--profile-gold))",
+          muted: "hsl(var(--profile-gold-muted))",
+          500: "hsl(var(--profile-gold))",
+          400: "hsl(45 93% 68%)",
+          300: "hsl(45 93% 78%)",
+        },
+        amber: {
+          500: "hsl(var(--profile-amber))",
+        },
+        copper: {
+          500: "hsl(var(--profile-copper))",
+        },
+        'profile-text': {
+          primary: "hsl(var(--profile-text-primary))",
+          secondary: "hsl(var(--profile-text-secondary))",
+          muted: "hsl(var(--profile-text-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -55,8 +81,18 @@ const config: Config = {
         'fade-in': 'fade-in 0.3s ease-out',
         'slide-in': 'slide-in 0.3s ease-out',
         'blob': 'blob 7s infinite',
-        'fade-in-up': 'fade-in-up 0.5s ease-out',
+        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+        'fade-in-down': 'fade-in-down 0.6s ease-out forwards',
         'scale-in': 'scale-in 0.3s ease-out',
+        'scale-fade-in': 'scale-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-up-fade': 'slide-up-fade 0.4s ease-out forwards',
+        'shake': 'shake 0.3s ease-out',
+        'shimmer': 'shimmer 0.7s ease-out',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'slide-up-stagger': 'slide-up-stagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-scale': 'fade-scale 0.5s ease-out forwards',
+        'marquee': 'marquee 30s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
       },
       keyframes: {
         'fade-in': {
@@ -77,9 +113,50 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'fade-in-down': {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
         'scale-in': {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'scale-fade-in': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'slide-up-fade': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-4px)' },
+          '75%': { transform: 'translateX(4px)' },
+        },
+        'shimmer': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'glow-pulse': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.7' },
+        },
+        'slide-up-stagger': {
+          '0%': { opacity: '0', transform: 'translateY(40px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-scale': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'marquee': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
       },
     },

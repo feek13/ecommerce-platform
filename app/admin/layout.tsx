@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
-import { supabaseAuth } from '@/lib/supabase'
+import { AdminAuthProvider, useAdminAuth } from '@/app/providers/AdminAuthProvider'
 import Link from 'next/link'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAdminAuth()
   const [loggingOut, setLoggingOut] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -30,11 +29,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!loading && !isLoginPage) {
       if (!user) {
-        console.log('Admin: No user, redirecting to admin login')
+        console.log('Admin: No admin session, redirecting to admin login')
         router.push('/admin/login')
       } else if (profile?.role !== 'admin') {
         console.log('Admin: User role is', profile?.role, 'not admin, redirecting to login')
-        // 非管理员账户，直接跳转到登录页（不登出，保持主网站的登录状态）
+        // 非管理员账户，直接跳转到登录页（不影响主站和商家的登录状态）
         router.push('/admin/login')
       } else {
         console.log('Admin: Access granted for', user.email)
@@ -45,18 +44,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const handleLogout = async () => {
     setConfirmDialog({
       isOpen: true,
-      title: '退出登录',
-      message: '确定要退出管理后台吗？退出后需要重新登录才能访问管理功能。',
+      title: '退出管理员登录',
+      message: '确定要退出管理后台吗？这不会影响您在主站或商家后台的登录状态。',
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
 
         try {
           setLoggingOut(true)
-          await supabaseAuth.auth.signOut()
+          await signOut()
           router.push('/admin/login')
           router.refresh()
         } catch (error) {
-          console.error('Logout error:', error)
+          console.error('Admin logout error:', error)
         } finally {
           setLoggingOut(false)
         }
@@ -194,5 +193,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main className="flex-1 ml-64 p-8">{children}</main>
       </div>
     </div>
+  )
+}
+
+// Wrap with AdminAuthProvider
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminAuthProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminAuthProvider>
   )
 }

@@ -6,9 +6,24 @@
       "Bash(npm run dev:*)",
       "Bash(curl:*)",
       "Bash(xargs kill:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\n升级设计系统：集成完整的设计令牌、图标库和 Claude Code 配置\n\n建立统一的设计语言，包括 HSL 颜色系统、动画效果、圆角规范等，提升整体视觉一致性和开发效率。\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Skill(frontend-design)",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__emulate",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__press_key",
+      "mcp__chrome-devtools__resize_page",
+      "mcp__chrome-devtools__evaluate_script",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__supabase__execute_sql",
+      "Bash(cat:*)",
+      "mcp__context7__get-library-docs"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "chrome-devtools",
     "context7",

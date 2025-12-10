@@ -1,40 +1,29 @@
-// Temporary workaround: Direct fetch to Supabase REST API
-// The Supabase JS SDK is hanging in the browser, so we use fetch directly
+// Direct fetch to Supabase REST API with multi-session support
+// Supports separate sessions for main site, seller, and admin sections
+
+import { SessionType, getValidToken, clearToken } from './supabase-multi'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Get user token from localStorage (where Supabase stores it)
-function getUserToken(): string | null {
-  try {
-    const authData = localStorage.getItem('sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
-    if (authData) {
-      const parsed = JSON.parse(authData)
-      return parsed?.access_token || null
-    }
-  } catch (error) {
-    console.warn('Failed to get user token:', error)
-  }
-  return null
-}
-
-// Clear expired token from localStorage
-function clearExpiredToken() {
-  try {
-    const key = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token'
-    localStorage.removeItem(key)
-    console.log('Cleared expired token from localStorage')
-  } catch (error) {
-    console.warn('Failed to clear expired token:', error)
-  }
-}
-
-async function supabaseFetch(endpoint: string, options: RequestInit = {}, retryWithAnonKey = true) {
+// Fetch with session type support and automatic token refresh
+async function supabaseFetch(
+  endpoint: string,
+  options: RequestInit = {},
+  sessionType: SessionType = 'main',
+  retryWithAnonKey = true
+) {
   const url = `${SUPABASE_URL}/rest/v1/${endpoint}`
 
-  // Use user token if available, otherwise use anon key
-  const userToken = getUserToken()
+  // Get valid token (auto-refreshes if expired)
+  const userToken = await getValidToken(sessionType)
   const authToken = userToken || SUPABASE_ANON_KEY
+
+  // Debug: log token status for mutations
+  if (options.method && options.method !== 'GET') {
+    console.log(`[supabaseFetch] ${options.method} ${endpoint}`)
+    console.log(`[supabaseFetch] sessionType: ${sessionType}, hasToken: ${!!userToken}`)
+  }
 
   const headers = {
     'apikey': SUPABASE_ANON_KEY,
@@ -52,12 +41,12 @@ async function supabaseFetch(endpoint: string, options: RequestInit = {}, retryW
   if (!response.ok) {
     const errorText = await response.text()
 
-    // Handle JWT expired error
+    // Handle JWT expired error (shouldn't happen often with auto-refresh)
     if (response.status === 401 && errorText.includes('JWT expired') && retryWithAnonKey && userToken) {
-      console.warn('JWT token expired, clearing and retrying with anon key')
-      clearExpiredToken()
+      console.warn(`JWT token expired for ${sessionType}, clearing and retrying with anon key`)
+      clearToken(sessionType)
       // Retry with anon key only (pass false to prevent infinite retry)
-      return supabaseFetch(endpoint, options, false)
+      return supabaseFetch(endpoint, options, sessionType, false)
     }
 
     throw new Error(`Supabase fetch error: ${response.status} - ${errorText}`)
@@ -220,4 +209,58 @@ export async function markConversationAsRead(conversationId: string, userId: str
     method: 'PATCH',
     body: JSON.stringify({ is_read: true })
   })
+}
+
+// Admin: Seller application functions
+export async function getSellerApplications(filter?: 'pending' | 'approved' | 'rejected', sessionType: SessionType = 'main') {
+  let endpoint = `seller_applications?select=*,profiles!seller_applications_user_id_fkey(email,full_name)&order=created_at.desc`
+  if (filter && filter !== 'all') {
+    endpoint += `&status=eq.${filter}`
+  }
+  return supabaseFetch(endpoint, {}, sessionType)
+}
+
+export async function updateProfileRole(userId: string, role: string, sessionType: SessionType = 'main') {
+  return supabaseFetch(`profiles?id=eq.${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role })
+  }, sessionType)
+}
+
+export async function updateSellerApplicationStatus(
+  applicationId: string,
+  status: 'approved' | 'rejected',
+  reviewedAt: string,
+  sessionType: SessionType = 'main'
+) {
+  return supabaseFetch(`seller_applications?id=eq.${applicationId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      status,
+      reviewed_at: reviewedAt
+    })
+  }, sessionType)
+}
+
+// Seller: Product management functions
+export async function getSellerProducts(sellerId: string, filter?: 'all' | 'active' | 'inactive', sessionType: SessionType = 'seller') {
+  let endpoint = `products?seller_id=eq.${sellerId}&order=created_at.desc`
+  if (filter && filter !== 'all') {
+    endpoint += `&status=eq.${filter}`
+  }
+  return supabaseFetch(endpoint, {}, sessionType)
+}
+
+export async function updateProductStatus(productId: string, sellerId: string, status: string, sessionType: SessionType = 'seller') {
+  return supabaseFetch(`products?id=eq.${productId}&seller_id=eq.${sellerId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  }, sessionType)
+}
+
+export async function deleteProduct(productId: string, sellerId: string, sessionType: SessionType = 'seller') {
+  return supabaseFetch(`products?id=eq.${productId}&seller_id=eq.${sellerId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'deleted' })
+  }, sessionType)
 }

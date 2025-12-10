@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import { useChat } from '@/hooks/useChat'
 import ConversationList from '@/components/chat/ConversationList'
 import ChatWindow from '@/components/chat/ChatWindow'
 
 export default function SellerChatPage() {
   const router = useRouter()
-  const { user, profile, loading: authLoading } = useAuth()
+  const { user, profile, loading: authLoading } = useSellerAuth()
   const [isMobile, setIsMobile] = useState(false)
   const [showConversationList, setShowConversationList] = useState(true)
 

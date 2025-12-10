@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/hooks/useAuth'
+import { supabaseSeller } from '@/lib/supabase-multi'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import type { Category, Product } from '@/types/database'
 
 export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
-  const { user } = useAuth()
+  const { user } = useSellerAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -32,7 +32,7 @@ export default function EditProductPage() {
   }, [])
 
   const fetchCategories = async () => {
-    const { data } = await supabase
+    const { data } = await supabaseSeller
       .from('categories')
       .select('*')
       .order('name')
@@ -41,7 +41,7 @@ export default function EditProductPage() {
 
   const fetchProduct = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseSeller
         .from('products')
         .select('*')
         .eq('id', params.id)
@@ -94,7 +94,7 @@ export default function EditProductPage() {
 
       const images = formData.images.filter((img) => img.trim() !== '')
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseSeller
         .from('products')
         .update({
           category_id: formData.category_id || null,

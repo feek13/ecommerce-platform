@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/hooks/useAuth'
+import { getSellerProducts, updateProductStatus, deleteProduct } from '@/lib/supabase-fetch'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import type { Product } from '@/types/database'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 export default function SellerProductsPage() {
-  const { user } = useAuth()
+  const { user } = useSellerAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all')
@@ -35,19 +35,7 @@ export default function SellerProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      let query = supabase
-        .from('products')
-        .select('*')
-        .eq('seller_id', user?.id)
-        .order('created_at', { ascending: false })
-
-      if (filter !== 'all') {
-        query = query.eq('status', filter)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
+      const data = await getSellerProducts(user?.id || '', filter)
       setProducts(data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
@@ -65,13 +53,8 @@ export default function SellerProductsPage() {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
 
         try {
-          const { error } = await supabase
-            .from('products')
-            .update({ status: 'deleted' })
-            .eq('id', id)
-
-          if (error) throw error
-
+          console.log('[deleteProduct] productId:', id, 'sellerId:', user?.id)
+          await deleteProduct(id, user?.id || '')
           setToast({ message: '商品已删除', type: 'success' })
           fetchProducts()
         } catch (error) {
@@ -86,13 +69,7 @@ export default function SellerProductsPage() {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
 
     try {
-      const { error } = await supabase
-        .from('products')
-        .update({ status: newStatus })
-        .eq('id', id)
-
-      if (error) throw error
-
+      await updateProductStatus(id, user?.id || '', newStatus)
       setToast({
         message: `商品已${newStatus === 'active' ? '上架' : '下架'}`,
         type: 'success'

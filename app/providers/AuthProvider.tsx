@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabaseAuth } from '@/lib/supabase'
+import { supabaseMain, getStorageKey } from '@/lib/supabase-multi'
 import type { Profile } from '@/types/database'
 
 type AuthContextType = {
@@ -34,10 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
       const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-      // Get user token from localStorage
+      // Get user token from localStorage (using main session key)
       let userToken = null
       try {
-        const authData = localStorage.getItem('sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
+        const authData = localStorage.getItem(getStorageKey('main'))
         if (authData) {
           const parsed = JSON.parse(authData)
           userToken = parsed?.access_token || null
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         // Add a short timeout since Supabase SDK is not working properly in browser
         // Guests don't need auth, so fail fast and continue
-        const sessionPromise = supabaseAuth.auth.getSession()
+        const sessionPromise = supabaseMain.auth.getSession()
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Session timeout - continuing as guest')), 3000)
         )
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabaseAuth.auth.onAuthStateChange(async (_event, session) => {
+    } = supabaseMain.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
 
       if (session?.user) {
@@ -143,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabaseAuth.auth.signOut()
+      await supabaseMain.auth.signOut()
       setUser(null)
       setProfile(null)
     } catch (error) {

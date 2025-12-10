@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -29,7 +29,7 @@ type Order = {
 }
 
 export default function SellerOrdersPage() {
-  const { user, profile } = useAuth()
+  const { user, profile } = useSellerAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')

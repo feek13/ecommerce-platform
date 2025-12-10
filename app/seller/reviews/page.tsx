@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import type { Review } from '@/types/database'
 
 export default function SellerReviewsPage() {
-  const { user } = useAuth()
+  const { user } = useSellerAuth()
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')

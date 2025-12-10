@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/hooks/useAuth'
+import { supabaseSeller } from '@/lib/supabase-multi'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import type { Category } from '@/types/database'
 
 export default function NewProductPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user } = useSellerAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +29,7 @@ export default function NewProductPage() {
   }, [])
 
   const fetchCategories = async () => {
-    const { data } = await supabase
+    const { data } = await supabaseSeller
       .from('categories')
       .select('*')
       .order('name')
@@ -61,7 +61,7 @@ export default function NewProductPage() {
 
       const images = formData.images.filter((img) => img.trim() !== '')
 
-      const { data, error: insertError } = await supabase
+      const { data, error: insertError } = await supabaseSeller
         .from('products')
         .insert({
           seller_id: user?.id,

@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdminAuth } from '@/app/providers/AdminAuthProvider'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import Toast from '@/components/ui/Toast'
 import { InfoIcon } from '@/components/icons/Icons'
 
-export default function AdminLoginPage() {
+export default function SellerLoginPage() {
   const router = useRouter()
-  const { signIn } = useAdminAuth()
+  const { signIn } = useSellerAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,17 +25,17 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      console.log('[Admin Login] Starting login with independent admin session...')
+      console.log('[Seller Login] Starting login with independent seller session...')
 
       const { error } = await signIn(email, password)
 
       if (error) throw error
 
-      console.log('[Admin Login] Login successful, redirecting to /admin')
-      router.replace('/admin')
+      console.log('[Seller Login] Login successful, redirecting to /seller')
+      router.replace('/seller')
       router.refresh()
     } catch (error: any) {
-      console.error('[Admin Login] Login error:', error)
+      console.error('[Seller Login] Login error:', error)
       setToast({
         message: error.message === 'Invalid login credentials'
           ? '邮箱或密码错误'
@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center p-4">
       {toast && (
         <Toast
           message={toast.message}
@@ -60,10 +60,10 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-block p-4 bg-white rounded-full shadow-lg mb-4">
-            <div className="text-5xl">⚙️</div>
+            <div className="text-5xl">🛍️</div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">管理员后台</h1>
-          <p className="text-gray-600">请使用管理员账号登录</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">商家后台</h1>
+          <p className="text-gray-600">请使用商家账号登录</p>
         </div>
 
         {/* Login Form */}
@@ -79,8 +79,8 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                placeholder="admin@example.com"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                placeholder="seller@example.com"
               />
             </div>
 
@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                 placeholder="••••••••"
               />
             </div>
@@ -103,34 +103,41 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '登录中...' : '登录'}
             </button>
           </form>
 
           {/* Info */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-6 p-4 bg-amber-50 rounded-lg">
             <div className="flex items-start gap-2">
-              <InfoIcon className="text-blue-600 w-5 h-5 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-800">
+              <InfoIcon className="text-amber-600 w-5 h-5 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
                 <p className="font-medium mb-1">提示</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• 管理员登录独立于主站和商家后台</li>
+                  <li>• 商家登录独立于主站和管理员后台</li>
                   <li>• 登录或登出不会影响其他账户的登录状态</li>
-                  <li>• 只有管理员账户才能登录此后台</li>
+                  <li>• 只有商家账户才能登录此后台</li>
+                  <li>• 还没有商家账户？请先在主站申请成为商家</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* Back to Home */}
-          <div className="mt-6 text-center">
+          {/* Links */}
+          <div className="mt-6 flex justify-between text-sm">
             <button
               onClick={() => router.push('/')}
-              className="text-sm text-gray-600 hover:text-purple-600 transition"
+              className="text-gray-600 hover:text-orange-600 transition"
             >
               ← 返回首页
+            </button>
+            <button
+              onClick={() => router.push('/apply-seller')}
+              className="text-orange-600 hover:text-orange-700 transition font-medium"
+            >
+              申请成为商家 →
             </button>
           </div>
         </div>

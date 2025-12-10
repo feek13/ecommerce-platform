@@ -7,6 +7,7 @@ import { useCart } from '@/hooks/useCart'
 import { useAuth } from '@/hooks/useAuth'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import ProductDetailSkeleton from '@/components/ui/ProductDetailSkeleton'
 import ReviewFilters from '@/components/review/ReviewFilters'
 import ReviewCard from '@/components/review/ReviewCard'
 import type { Product } from '@/types/database'
@@ -153,9 +154,7 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-[#EAEDED]">
         <Header />
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
+        <ProductDetailSkeleton />
         <Footer />
       </div>
     )

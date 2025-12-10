@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/hooks/useAuth'
+import { supabaseSeller } from '@/lib/supabase-multi'
+import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 
 export default function SellerDashboard() {
-  const { user } = useAuth()
+  const { user } = useSellerAuth()
   const [stats, setStats] = useState({
     totalProducts: 0,
     activeProducts: 0,
@@ -25,7 +25,7 @@ export default function SellerDashboard() {
   const fetchStats = async () => {
     try {
       // Fetch product stats
-      const { data: products } = await supabase
+      const { data: products } = await supabaseSeller
         .from('products')
         .select('status, price')
         .eq('seller_id', user?.id)
@@ -34,7 +34,7 @@ export default function SellerDashboard() {
       const activeProducts = products?.filter((p) => p.status === 'active').length || 0
 
       // Fetch order stats
-      const { data: orders } = await supabase
+      const { data: orders } = await supabaseSeller
         .from('order_items')
         .select('orders!inner(status, total_amount), quantity, price')
         .eq('orders.seller_id', user?.id)

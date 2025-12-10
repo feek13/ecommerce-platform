@@ -1,11 +1,13 @@
-import { createClient } from '@supabase/supabase-js'
+/**
+ * Supabase Client - Backward Compatibility Exports
+ *
+ * This file re-exports the main site Supabase client for backward compatibility.
+ * For multi-session support, import from './supabase-multi' instead.
+ */
 
-// Browser client for client-side components
-// This will automatically handle localStorage session persistence
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+// Re-export main site client for backward compatibility
+export { supabaseMain as supabase, supabaseMain as supabaseAuth } from './supabase-multi'
 
-// Alias for backwards compatibility
-export const supabaseAuth = supabase
+// Also export multi-session utilities for convenience
+export { getStorageKey, getUserToken, clearToken } from './supabase-multi'
+export type { SessionType } from './supabase-multi'

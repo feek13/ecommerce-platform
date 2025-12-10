@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import {
+  getSellerApplications,
+  updateProfileRole,
+  updateSellerApplicationStatus,
+} from '@/lib/supabase-fetch'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import PromptDialog from '@/components/ui/PromptDialog'
@@ -62,27 +66,7 @@ export default function ApplicationsPage() {
     try {
       setLoading(true)
 
-      let query = supabase
-        .from('seller_applications')
-        .select(
-          `
-          *,
-          profiles!seller_applications_user_id_fkey (
-            email,
-            full_name
-          )
-        `
-        )
-        .order('created_at', { ascending: false })
-
-      if (filter !== 'all') {
-        query = query.eq('status', filter)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-
+      const data = await getSellerApplications(filter === 'all' ? undefined : filter, 'admin')
       setApplications(data || [])
     } catch (error) {
       console.error('Error fetching applications:', error)
@@ -103,24 +87,16 @@ export default function ApplicationsPage() {
         try {
           setProcessing(applicationId)
 
-          // 更新用户角色为 seller
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ role: 'seller' })
-            .eq('id', userId)
+          // 更新用户角色为 seller (使用 admin session)
+          await updateProfileRole(userId, 'seller', 'admin')
 
-          if (profileError) throw profileError
-
-          // 更新申请状态
-          const { error: applicationError } = await supabase
-            .from('seller_applications')
-            .update({
-              status: 'approved',
-              reviewed_at: new Date().toISOString(),
-            })
-            .eq('id', applicationId)
-
-          if (applicationError) throw applicationError
+          // 更新申请状态 (使用 admin session)
+          await updateSellerApplicationStatus(
+            applicationId,
+            'approved',
+            new Date().toISOString(),
+            'admin'
+          )
 
           setToast({ message: '申请已通过！', type: 'success' })
           fetchApplications()
@@ -145,15 +121,13 @@ export default function ApplicationsPage() {
         try {
           setProcessing(applicationId)
 
-          const { error } = await supabase
-            .from('seller_applications')
-            .update({
-              status: 'rejected',
-              reviewed_at: new Date().toISOString(),
-            })
-            .eq('id', applicationId)
-
-          if (error) throw error
+          // 更新申请状态 (使用 admin session)
+          await updateSellerApplicationStatus(
+            applicationId,
+            'rejected',
+            new Date().toISOString(),
+            'admin'
+          )
 
           setToast({ message: '申请已拒绝', type: 'success' })
           fetchApplications()

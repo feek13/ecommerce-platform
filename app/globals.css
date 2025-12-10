@@ -41,6 +41,37 @@
 
   /* Radius */
   --radius: 0.75rem;
+
+  /* ========================================
+     Profile Page - Deep Charcoal Elegance
+     ======================================== */
+
+  /* Charcoal Backgrounds */
+  --profile-bg-primary: 220 13% 8%;        /* #111318 - Deep charcoal */
+  --profile-bg-secondary: 220 13% 12%;     /* #1a1d24 - Elevated surface */
+  --profile-bg-tertiary: 220 13% 16%;      /* #242830 - Card surface */
+  --profile-bg-elevated: 220 13% 20%;      /* #2f343d - Hover state */
+
+  /* Warm Gold Accents */
+  --profile-gold: 45 93% 58%;              /* #f4c430 - Primary gold */
+  --profile-gold-muted: 45 80% 50%;        /* #d9a825 - Muted gold */
+  --profile-amber: 38 92% 50%;             /* #f59e0b - Warm amber */
+  --profile-copper: 25 84% 55%;            /* #e67e22 - Copper highlight */
+
+  /* Text Hierarchy */
+  --profile-text-primary: 0 0% 98%;        /* #fafafa - Headlines */
+  --profile-text-secondary: 210 9% 70%;    /* #adb5bd - Body text */
+  --profile-text-muted: 210 9% 46%;        /* #6c757d - Labels */
+
+  /* Borders & Effects */
+  --profile-border: 220 13% 22%;           /* Subtle borders */
+  --profile-border-gold: 45 93% 58% / 0.3; /* Gold border */
+  --profile-glow-gold: 45 93% 58% / 0.15;  /* Gold glow effect */
+
+  /* Status Colors */
+  --profile-success: 142 76% 46%;          /* #22c55e - Green */
+  --profile-warning: 38 92% 50%;           /* #f59e0b - Amber */
+  --profile-error: 0 72% 51%;              /* #dc2626 - Red */
 }
 
 .dark {
@@ -150,4 +181,390 @@
 /* Selection */
 ::selection {
   @apply bg-primary/20 text-primary;
+}
+
+/* Animation Delays */
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
+
+/* Animation Fill Mode */
+.animation-fill-both { animation-fill-mode: both; }
+.animation-fill-forwards { animation-fill-mode: forwards; }
+
+/* Auth Page Specific Styles */
+.auth-glow-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  will-change: opacity;
+}
+
+.auth-input-glow {
+  @apply absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl blur opacity-0 transition-opacity duration-300;
+}
+
+.auth-input-glow-active {
+  @apply opacity-30;
+}
+
+/* Shimmer Effect for Buttons */
+.shimmer-effect {
+  @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700;
+}
+
+.group:hover .shimmer-effect {
+  @apply translate-x-full;
+}
+
+/* ========================================
+   Profile Page - Deep Charcoal Elegance
+   ======================================== */
+
+/* Profile Background - Simple solid color for performance */
+.profile-bg {
+  background-color: hsl(var(--profile-bg-primary));
+  /* Removed SVG noise texture for performance - was causing constant repaints */
+}
+
+/* Profile Glass Card - Optimized for performance */
+.profile-glass-card {
+  background: hsl(var(--profile-bg-tertiary));
+  /* Removed backdrop-filter: blur() for performance - very expensive on mobile */
+  border: 1px solid hsl(var(--profile-border));
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-glass-card:hover {
+  border-color: hsl(var(--profile-border-gold));
+  box-shadow: 0 4px 20px hsl(var(--profile-glow-gold)); /* Reduced shadow spread */
+}
+
+/* Profile Input Styles */
+.profile-input {
+  @apply w-full px-4 py-3 rounded-xl transition-all duration-300 outline-none;
+  background: hsl(var(--profile-bg-secondary));
+  border: 1px solid hsl(var(--profile-border));
+  color: hsl(var(--profile-text-primary));
+}
+
+.profile-input::placeholder {
+  color: hsl(var(--profile-text-muted));
+}
+
+.profile-input:focus {
+  border-color: hsl(var(--profile-gold));
+  box-shadow: 0 0 0 3px hsl(var(--profile-glow-gold));
+}
+
+/* Profile Gold Button */
+.profile-btn-gold {
+  @apply px-6 py-3 rounded-xl font-medium;
+  background: linear-gradient(135deg, hsl(var(--profile-gold)), hsl(var(--profile-amber)));
+  color: hsl(220 13% 8%);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  will-change: transform;
+}
+
+.profile-btn-gold:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.profile-btn-gold:disabled {
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Profile Ghost Button */
+.profile-btn-ghost {
+  @apply px-6 py-3 rounded-xl font-medium transition-all duration-300;
+  background: transparent;
+  border: 1px solid hsl(var(--profile-border));
+  color: hsl(var(--profile-text-secondary));
+}
+
+.profile-btn-ghost:hover {
+  background: hsl(var(--profile-bg-elevated));
+  border-color: hsl(var(--profile-gold) / 0.5);
+  color: hsl(var(--profile-text-primary));
+}
+
+/* Profile Animations */
+@keyframes profile-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes profile-glow-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.02); }
+}
+
+@keyframes profile-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes profile-reveal-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes profile-reveal-scale {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-profile-float {
+  animation: profile-float 6s ease-in-out infinite;
+}
+
+.animate-profile-glow-pulse {
+  animation: profile-glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-profile-spin-slow {
+  animation: profile-spin-slow 20s linear infinite;
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+.animate-profile-reveal-up {
+  animation: profile-reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-profile-reveal-scale {
+  animation: profile-reveal-scale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollbar hide for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   Skeleton Loading Animations
+   ======================================== */
+
+/* Shimmer effect - flowing light reflection */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Fade in with upward movement */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+
+/* Bouncing dots for loading indicator */
+@keyframes bounce-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+
+/* Slow pulse for icons */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* ========================================
+   Homepage - Dark Luxury Theme
+   ======================================== */
+
+/* Homepage Hero Gradient */
+.hero-gradient {
+  background: linear-gradient(135deg,
+    hsl(var(--profile-bg-primary)) 0%,
+    hsl(220 13% 12%) 100%);
+}
+
+/* Hero subtle noise texture (performance-optimized) */
+.hero-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* Gold Text Utility */
+.text-gold {
+  color: hsl(var(--profile-gold));
+}
+
+/* Gold Gradient Text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, hsl(var(--profile-gold)) 0%, hsl(var(--profile-amber)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Homepage Section Background */
+.homepage-section {
+  background: hsl(var(--profile-bg-secondary));
+}
+
+/* Homepage Card */
+.homepage-card {
+  background: hsl(var(--profile-bg-tertiary));
+  border: 1px solid hsl(var(--profile-border));
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+}
+
+.homepage-card:hover {
+  border-color: hsl(var(--profile-gold) / 0.5);
+  transform: translateY(-4px);
+}
+
+/* Category Card Overlay */
+.category-overlay {
+  background: linear-gradient(to top,
+    hsl(var(--profile-bg-primary) / 0.95) 0%,
+    hsl(var(--profile-bg-primary) / 0.6) 40%,
+    transparent 100%);
+}
+
+/* Marquee Container */
+.marquee-container {
+  overflow: hidden;
+  background: hsl(var(--profile-bg-secondary));
+  border-top: 1px solid hsl(var(--profile-border));
+  border-bottom: 1px solid hsl(var(--profile-border));
+}
+
+/* Marquee Performance Optimization */
+.animate-marquee {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Radial Gradient for decorative elements */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Trust Bar */
+.trust-bar {
+  background: hsl(var(--profile-bg-tertiary));
+  border-radius: 1rem;
+}
+
+/* Product Card Dark Variant */
+.product-card-dark {
+  background: hsl(var(--profile-bg-tertiary));
+  border: 1px solid hsl(var(--profile-border));
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+}
+
+.product-card-dark:hover {
+  border-color: hsl(var(--profile-gold) / 0.5);
+  transform: translateY(-4px);
+}
+
+/* Price Gold Styling */
+.price-gold {
+  background: linear-gradient(135deg, hsl(var(--profile-gold)) 0%, hsl(var(--profile-amber)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Floating Animation for Hero Elements */
+.hero-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-float-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Stagger Animation Classes */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Image Hover Zoom - Optimized */
+.img-zoom {
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.group:hover .img-zoom {
+  transform: scale(1.04);
+}
+
+/* Gold Border Glow on Focus/Hover */
+.gold-glow:focus,
+.gold-glow:hover {
+  box-shadow: 0 0 20px hsl(var(--profile-gold) / 0.3);
 }
