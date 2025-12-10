@@ -119,35 +119,48 @@ export function getUserToken(sessionType: SessionType = 'main'): string | null {
   return null
 }
 
-// Refresh token if expired and return new token
+// Get valid token using SDK's getSession (handles refresh automatically)
 export async function getValidToken(sessionType: SessionType = 'main'): Promise<string | null> {
   if (typeof window === 'undefined') return null
 
-  const currentToken = getUserToken(sessionType)
+  const client = getSupabaseClient(sessionType)
 
-  // If no token, return null
-  if (!currentToken) {
-    return null
-  }
-
-  // Check if token is expired
-  if (isTokenExpired(currentToken)) {
-    // Use SDK to refresh the token
-    const client = getSupabaseClient(sessionType)
-    const { data, error } = await client.auth.refreshSession()
+  try {
+    // Use SDK's getSession which auto-refreshes if needed
+    const { data, error } = await client.auth.getSession()
 
     if (error) {
+      console.warn(`[getValidToken] Error getting ${sessionType} session:`, error.message)
       return null
     }
 
-    if (data.session?.access_token) {
-      return data.session.access_token
+    if (!data.session) {
+      console.warn(`[getValidToken] No valid ${sessionType} session found`)
+      return null
     }
 
+    // Check if token is about to expire (within 60 seconds)
+    if (isTokenExpired(data.session.access_token)) {
+      console.log(`[getValidToken] Token about to expire, refreshing ${sessionType} session...`)
+      const { data: refreshData, error: refreshError } = await client.auth.refreshSession()
+
+      if (refreshError) {
+        console.warn(`[getValidToken] Failed to refresh ${sessionType} session:`, refreshError.message)
+        // Still return the current token if available, let the API call handle the error
+        return data.session.access_token
+      }
+
+      if (refreshData.session?.access_token) {
+        console.log(`[getValidToken] Successfully refreshed ${sessionType} session`)
+        return refreshData.session.access_token
+      }
+    }
+
+    return data.session.access_token
+  } catch (err) {
+    console.error(`[getValidToken] Unexpected error for ${sessionType}:`, err)
     return null
   }
-
-  return currentToken
 }
 
 // Helper to clear token for a specific session type

@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
+import { getValidToken } from '@/lib/supabase-multi'
 import type { Review } from '@/types/database'
 
 export default function SellerReviewsPage() {
+  const router = useRouter()
   const { user } = useSellerAuth()
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,16 +32,15 @@ export default function SellerReviewsPage() {
       const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
       const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-      // Get user token from localStorage
-      let userToken = null
-      try {
-        const authData = localStorage.getItem('sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
-        if (authData) {
-          const parsed = JSON.parse(authData)
-          userToken = parsed?.access_token || null
-        }
-      } catch (e) {
-        console.warn('Failed to get user token:', e)
+      // Get valid token for seller session (auto-refreshes if expired)
+      const userToken = await getValidToken('seller')
+
+      // If no valid token, redirect to seller login
+      if (!userToken) {
+        console.warn('[SellerReviews] No valid seller token, redirecting to login')
+        setToast({ message: '登录已过期，请重新登录', type: 'warning' })
+        setTimeout(() => router.push('/seller/login'), 1500)
+        return
       }
 
       // Get reviews for products belonging to this seller
@@ -83,15 +85,14 @@ export default function SellerReviewsPage() {
       const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
       const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-      let userToken = null
-      try {
-        const authData = localStorage.getItem('sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
-        if (authData) {
-          const parsed = JSON.parse(authData)
-          userToken = parsed?.access_token || null
-        }
-      } catch (e) {
-        console.warn('Failed to get user token:', e)
+      // Get valid token for seller session (auto-refreshes if expired)
+      const userToken = await getValidToken('seller')
+
+      // If no valid token, redirect to seller login
+      if (!userToken) {
+        setToast({ message: '登录已过期，请重新登录', type: 'warning' })
+        setTimeout(() => router.push('/seller/login'), 1500)
+        return
       }
 
       const response = await fetch(
