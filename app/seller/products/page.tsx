@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getSellerProducts, updateProductStatus, deleteProduct } from '@/lib/supabase-fetch'
+import { getSellerProducts } from '@/lib/supabase-fetch'
+import { deleteProductAction, updateProductStatusAction } from '@/app/actions/products'
 import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import type { Product } from '@/types/database'
 import Toast from '@/components/ui/Toast'
@@ -53,10 +54,13 @@ export default function SellerProductsPage() {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
 
         try {
-          console.log('[deleteProduct] productId:', id, 'sellerId:', user?.id)
-          await deleteProduct(id, user?.id || '')
-          setToast({ message: '商品已删除', type: 'success' })
-          fetchProducts()
+          const result = await deleteProductAction(id, user?.id || '')
+          if (result.success) {
+            setToast({ message: '商品已删除', type: 'success' })
+            fetchProducts()
+          } else {
+            setToast({ message: result.error || '删除失败', type: 'error' })
+          }
         } catch (error) {
           console.error('Error deleting product:', error)
           setToast({ message: '删除失败，请稍后重试', type: 'error' })
@@ -69,12 +73,16 @@ export default function SellerProductsPage() {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
 
     try {
-      await updateProductStatus(id, user?.id || '', newStatus)
-      setToast({
-        message: `商品已${newStatus === 'active' ? '上架' : '下架'}`,
-        type: 'success'
-      })
-      fetchProducts()
+      const result = await updateProductStatusAction(id, user?.id || '', newStatus)
+      if (result.success) {
+        setToast({
+          message: `商品已${newStatus === 'active' ? '上架' : '下架'}`,
+          type: 'success'
+        })
+        fetchProducts()
+      } else {
+        setToast({ message: result.error || '更新失败', type: 'error' })
+      }
     } catch (error) {
       console.error('Error updating product status:', error)
       setToast({ message: '更新失败，请稍后重试', type: 'error' })

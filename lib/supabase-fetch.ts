@@ -19,12 +19,6 @@ async function supabaseFetch(
   const userToken = await getValidToken(sessionType)
   const authToken = userToken || SUPABASE_ANON_KEY
 
-  // Debug: log token status for mutations
-  if (options.method && options.method !== 'GET') {
-    console.log(`[supabaseFetch] ${options.method} ${endpoint}`)
-    console.log(`[supabaseFetch] sessionType: ${sessionType}, hasToken: ${!!userToken}`)
-  }
-
   const headers = {
     'apikey': SUPABASE_ANON_KEY,
     'Authorization': `Bearer ${authToken}`,

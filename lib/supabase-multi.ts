@@ -127,35 +127,20 @@ export async function getValidToken(sessionType: SessionType = 'main'): Promise<
 
   // If no token, return null
   if (!currentToken) {
-    console.log(`[getValidToken] No token for ${sessionType}`)
     return null
-  }
-
-  // Check token expiration details
-  try {
-    const payload = JSON.parse(atob(currentToken.split('.')[1]))
-    const expTime = new Date(payload.exp * 1000)
-    const now = new Date()
-    console.log(`[getValidToken] Token exp: ${expTime.toISOString()}, now: ${now.toISOString()}, expired: ${isTokenExpired(currentToken)}`)
-  } catch (e) {
-    console.log(`[getValidToken] Could not decode token`)
   }
 
   // Check if token is expired
   if (isTokenExpired(currentToken)) {
-    console.log(`[getValidToken] Token expired for ${sessionType}, refreshing...`)
-
     // Use SDK to refresh the token
     const client = getSupabaseClient(sessionType)
     const { data, error } = await client.auth.refreshSession()
 
     if (error) {
-      console.warn(`[getValidToken] Failed to refresh ${sessionType} token:`, error.message)
       return null
     }
 
     if (data.session?.access_token) {
-      console.log(`[getValidToken] Token refreshed for ${sessionType}`)
       return data.session.access_token
     }
 

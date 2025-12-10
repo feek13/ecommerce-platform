@@ -20,7 +20,8 @@
       "mcp__chrome-devtools__wait_for",
       "mcp__supabase__execute_sql",
       "Bash(cat:*)",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(git commit:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
