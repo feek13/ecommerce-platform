@@ -5,35 +5,10 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-
-type Order = {
-  id: number
-  user_id: string
-  total_amount: number
-  status: string
-  shipping_address: any
-  created_at: string
-  updated_at: string
-  user: {
-    id: string
-    email: string
-    full_name: string | null
-  }
-  order_items?: Array<{
-    id: number
-    product_id: number
-    quantity: number
-    price: number
-    product: {
-      id: number
-      name: string
-      images: string[]
-    }
-  }>
-}
+import type { AdminOrder } from '@/types/database'
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<AdminOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -183,8 +158,8 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = orders.filter(order =>
     order.id.toString().includes(searchQuery) ||
-    order.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (order.user.full_name && order.user.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
+    order.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (order.user?.full_name && order.user.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   if (loading) {

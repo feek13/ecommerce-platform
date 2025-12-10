@@ -206,7 +206,7 @@ export async function markConversationAsRead(conversationId: string, userId: str
 }
 
 // Admin: Seller application functions
-export async function getSellerApplications(filter?: 'pending' | 'approved' | 'rejected', sessionType: SessionType = 'main') {
+export async function getSellerApplications(filter?: 'all' | 'pending' | 'approved' | 'rejected', sessionType: SessionType = 'main') {
   let endpoint = `seller_applications?select=*,profiles!seller_applications_user_id_fkey(email,full_name)&order=created_at.desc`
   if (filter && filter !== 'all') {
     endpoint += `&status=eq.${filter}`

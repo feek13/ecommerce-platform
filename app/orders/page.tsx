@@ -11,32 +11,12 @@ import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import ReviewModal from '@/components/review/ReviewModal'
 import { hasUserReviewedProduct } from '@/lib/supabase-fetch'
-
-type Order = {
-  id: number
-  user_id: string
-  total_amount: number
-  status: string
-  shipping_address: any
-  created_at: string
-  updated_at: string
-  order_items?: Array<{
-    id: number
-    product_id: number
-    quantity: number
-    price: number
-    product: {
-      id: number
-      name: string
-      images: string[]
-    }
-  }>
-}
+import type { OrderWithItems } from '@/types/database'
 
 export default function OrdersPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<OrderWithItems[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null)
@@ -148,7 +128,7 @@ export default function OrdersPage() {
     return statusMap[status] || { text: status, color: 'text-gray-600 bg-gray-50' }
   }
 
-  const getStatusActions = (order: Order) => {
+  const getStatusActions = (order: OrderWithItems) => {
     switch (order.status) {
       case 'pending':
         return (

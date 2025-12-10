@@ -114,24 +114,33 @@ export interface Favorite {
   product?: Product
 }
 
+// Shipping address structure (stored as JSON in database)
+export interface ShippingAddress {
+  name: string
+  phone: string
+  province?: string
+  city?: string
+  district?: string
+  address: string
+  postalCode?: string
+}
+
+// Base Order interface - matches actual database schema
 export interface Order {
-  id: string
-  order_number: string
+  id: number                                    // BIGINT in database
   user_id: string
+  total_amount: number                          // actual column name
   status: OrderStatus
-  subtotal: number
-  shipping_fee: number
-  tax: number
-  total: number
-  shipping_name: string
-  shipping_phone: string
-  shipping_address: string
-  shipping_city: string
-  shipping_state?: string
-  shipping_postal_code: string
-  shipping_country: string
+  shipping_address: ShippingAddress | string    // JSON or parsed
+  created_at: string
+  updated_at: string
+  // Optional fields that may exist in some tables
+  order_number?: string
+  subtotal?: number
+  shipping_fee?: number
+  tax?: number
   payment_method?: string
-  payment_status: PaymentStatus
+  payment_status?: PaymentStatus
   paid_at?: string
   tracking_number?: string
   shipped_at?: string
@@ -139,8 +148,45 @@ export interface Order {
   cancelled_at?: string
   cancel_reason?: string
   refunded_at?: string
-  created_at: string
-  updated_at: string
+}
+
+// OrderItem with product info for display
+export interface OrderItemWithProduct {
+  id: number
+  product_id: number
+  quantity: number
+  price: number
+  product: {
+    id: number
+    name: string
+    images: string[]
+  }
+}
+
+// OrderItem with seller info (for seller orders page)
+export interface OrderItemWithSellerProduct extends OrderItemWithProduct {
+  product: {
+    id: number
+    name: string
+    images: string[]
+    seller_id: string
+  }
+}
+
+// Order with items (for buyer orders page)
+export interface OrderWithItems extends Order {
+  order_items?: OrderItemWithProduct[]
+}
+
+// Order with items for seller (filtered to seller's products)
+export interface SellerOrder extends Order {
+  order_items?: OrderItemWithSellerProduct[]
+}
+
+// Order with user info (for admin orders page)
+export interface AdminOrder extends Order {
+  user?: Pick<Profile, 'id' | 'email' | 'full_name'>
+  order_items?: OrderItemWithProduct[]
 }
 
 export interface OrderItem {

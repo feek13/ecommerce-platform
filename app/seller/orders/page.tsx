@@ -5,32 +5,11 @@ import { useSellerAuth } from '@/app/providers/SellerAuthProvider'
 import Link from 'next/link'
 import Toast from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-
-type Order = {
-  id: number
-  user_id: string
-  total_amount: number
-  status: string
-  shipping_address: any
-  created_at: string
-  updated_at: string
-  order_items?: Array<{
-    id: number
-    product_id: number
-    quantity: number
-    price: number
-    product: {
-      id: number
-      name: string
-      images: string[]
-      seller_id: string
-    }
-  }>
-}
+import type { SellerOrder } from '@/types/database'
 
 export default function SellerOrdersPage() {
   const { user, profile } = useSellerAuth()
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<SellerOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -95,9 +74,9 @@ export default function SellerOrdersPage() {
       const allOrders = await response.json()
 
       // Filter orders to only include those with products from this seller
-      const sellerOrders = allOrders.filter((order: Order) => {
+      const sellerOrders = allOrders.filter((order: SellerOrder) => {
         return order.order_items?.some(item => item.product?.seller_id === user.id)
-      }).map((order: Order) => {
+      }).map((order: SellerOrder) => {
         // Filter order items to only show this seller's products
         return {
           ...order,
@@ -108,7 +87,7 @@ export default function SellerOrdersPage() {
       // Apply status filter
       let filteredOrders = sellerOrders
       if (filter !== 'all') {
-        filteredOrders = sellerOrders.filter((order: Order) => order.status === filter)
+        filteredOrders = sellerOrders.filter((order: SellerOrder) => order.status === filter)
       }
 
       setOrders(filteredOrders || [])
